@@ -5,6 +5,86 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local VirtualUser = game:GetService("VirtualUser")
 
+local function ShowNotification(title, description, duration)
+    duration = duration or 3
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 320, 0, 90)
+    Frame.Position = UDim2.new(1, 20, 0, 20) -- Mulai dari luar kanan
+    Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = ScreenGui
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 10)
+    Corner.Parent = Frame
+
+    -- Shadow effect
+    local Shadow = Instance.new("ImageLabel")
+    Shadow.Image = "rbxasset://textures/DragLockedCursor.png"
+    Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    Shadow.ImageTransparency = 0.7
+    Shadow.BackgroundTransparency = 1
+    Shadow.Size = UDim2.new(1, 20, 1, 20)
+    Shadow.Position = UDim2.new(-0.5, -10, -0.5, -10)
+    Shadow.Parent = Frame
+
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, -20, 0, 25)
+    Title.Position = UDim2.new(0, 10, 0, 10)
+    Title.BackgroundTransparency = 1
+    Title.TextColor3 = Color3.fromRGB(250, 7, 7)
+    Title.TextSize = 15
+    Title.Font = Enum.Font.GothamBold
+    Title.Text = title
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = Frame
+
+    local Desc = Instance.new("TextLabel")
+    Desc.Size = UDim2.new(1, -20, 0, 45)
+    Desc.Position = UDim2.new(0, 10, 0, 38)
+    Desc.BackgroundTransparency = 1
+    Desc.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Desc.TextSize = 12
+    Desc.Font = Enum.Font.Gotham
+    Desc.Text = description
+    Desc.TextWrapped = true
+    Desc.TextXAlignment = Enum.TextXAlignment.Left
+    Desc.TextYAlignment = Enum.TextYAlignment.Top
+    Desc.Parent = Frame
+
+    -- Animasi slide in dari kanan
+    local tweenInfo = TweenInfo.new(
+        0.5,
+        Enum.EasingStyle.Back,
+        Enum.EasingDirection.Out
+    )
+    local slideIn = TweenService:Create(Frame, tweenInfo, {
+        Position = UDim2.new(1, -340, 0, 20)
+    })
+    slideIn:Play()
+
+    -- Tunggu duration, lalu slide out
+    task.wait(duration)
+    
+    local tweenInfoOut = TweenInfo.new(
+        0.4,
+        Enum.EasingStyle.Back,
+        Enum.EasingDirection.In
+    )
+    local slideOut = TweenService:Create(Frame, tweenInfoOut, {
+        Position = UDim2.new(1, 20, 0, 20)
+    })
+    slideOut:Play()
+    
+    slideOut.Completed:Connect(function()
+        ScreenGui:Destroy()
+    end)
+end
+
 local Custom = {} do
   Custom.ColorRGB = Color3.fromRGB(250, 7, 7)
 
