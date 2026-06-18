@@ -90,20 +90,20 @@ end
 
 local Open_Close = OpenClose()
 
+-- PERBAIKAN: Optimize MakeDraggable dengan debouncing
 local function MakeDraggable(topbarobject, object)
-  local dragging, dragStart, startPos = false, nil, nil
-
-  local function UpdatePos(input)
-    local delta = input.Position - dragStart
-    local newPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    object.Position = newPos
-  end
+  local dragging = false
+  local dragStart = nil
+  local startPos = nil
+  local lastUpdate = 0
+  local updateRate = 1/60 -- 60fps
 
   topbarobject.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
       dragging = true
       dragStart = input.Position
       startPos = object.Position
+      lastUpdate = tick()
 
       input.Changed:Connect(function()
         if input.UserInputState == Enum.UserInputState.End then
@@ -113,9 +113,14 @@ local function MakeDraggable(topbarobject, object)
     end
   end)
 
-  topbarobject.InputChanged:Connect(function(input)
+  UserInputService.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-      UpdatePos(input)
+      local currentTime = tick()
+      if currentTime - lastUpdate >= updateRate then
+        local delta = input.Position - dragStart
+        object.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        lastUpdate = currentTime
+      end
     end
   end)
 end
@@ -664,15 +669,19 @@ function Speed_Library:CreateWindow(Config)
     Size = UDim2.new(0, 8, 0, 8)
   }, ResizeHandle)
 
+  -- PERBAIKAN: Optimize resize dengan debouncing
   local ResizeActive = false
   local ResizeStartPos = nil
   local ResizeStartSize = nil
+  local lastResizeUpdate = 0
+  local resizeUpdateRate = 1/60 -- 60fps
 
   ResizeHandle.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
       ResizeActive = true
       ResizeStartPos = input.Position
       ResizeStartSize = DropShadowHolder.Size
+      lastResizeUpdate = tick()
       
       input.Changed:Connect(function()
         if input.UserInputState == Enum.UserInputState.End then
@@ -684,13 +693,17 @@ function Speed_Library:CreateWindow(Config)
 
   UserInputService.InputChanged:Connect(function(input)
     if ResizeActive and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-      local delta = input.Position - ResizeStartPos
-      local newWidth = math.max(300, ResizeStartSize.X.Offset + delta.X)
-      local newHeight = math.max(250, ResizeStartSize.Y.Offset + delta.Y)
-      
-      DropShadowHolder.Size = UDim2.new(0, newWidth, 0, newHeight)
-      DropShadow.Size = UDim2.new(0, newWidth, 0, newHeight)
-      Main.Size = UDim2.new(0, newWidth, 0, newHeight)
+      local currentTime = tick()
+      if currentTime - lastResizeUpdate >= resizeUpdateRate then
+        local delta = input.Position - ResizeStartPos
+        local newWidth = math.max(300, ResizeStartSize.X.Offset + delta.X)
+        local newHeight = math.max(250, ResizeStartSize.Y.Offset + delta.Y)
+        
+        DropShadowHolder.Size = UDim2.new(0, newWidth, 0, newHeight)
+        DropShadow.Size = UDim2.new(0, newWidth, 0, newHeight)
+        Main.Size = UDim2.new(0, newWidth, 0, newHeight)
+        lastResizeUpdate = currentTime
+      end
     end
   end)
 
