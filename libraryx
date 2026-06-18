@@ -171,129 +171,131 @@ Speed_Library.Unloaded = false
 
 function Speed_Library:SetNotification(Config)
   local Title = Config.Title or Config[1] or "Notifikasi"
-  local Description = Config.Description or Config.Content or Config[2] or ""
-  local Duration = Config.Duration or Config[5] or 3
-  local Delay = Config.Delay or Config[6] or 4
+  local Description = Config.Description or Config.Content or Config[2] or "Tidak ada deskripsi"
+  local Duration = Config.Duration or Config[5] or 3.5
 
   local NotificationGui = Custom:Create("ScreenGui", {
     ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
     ResetOnSpawn = false
   }, RunService:IsStudio() and Player.PlayerGui or (gethui() or cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui")))
 
-  local NotificationLayout = Custom:Create("Frame", {
+  -- Layout untuk stacking notifikasi
+  local Layout = Custom:Create("Frame", {
     AnchorPoint = Vector2.new(1, 1),
     BackgroundTransparency = 1,
-    Position = UDim2.new(1, -20, 1, -20),
-    Size = UDim2.new(0, 320, 1, 0),
+    Position = UDim2.new(1, -25, 1, -25),
+    Size = UDim2.new(0, 340, 1, 0),
     Name = "NotificationLayout"
   }, NotificationGui)
 
-  -- Hitung posisi vertikal
-  local Count = 0
-  for _, v in ipairs(NotificationLayout:GetChildren()) do
-    if v:IsA("Frame") then
-      Count = Count + 1
-    end
-  end
+  -- Hitung berapa notifikasi sudah ada
+  local Existing = Layout:GetChildren()
+  local Count = #Existing
+  local YPos = -(Count * 110 + 20)
 
-  local NotificationFrame = Custom:Create("Frame", {
+  local Notif = Custom:Create("Frame", {
     BackgroundColor3 = Color3.fromRGB(20, 20, 20),
-    BackgroundTransparency = 0.05,
+    Size = UDim2.new(0, 340, 0, 95),
+    Position = UDim2.new(1, 450, 1, YPos),  -- Mulai dari luar kanan
     BorderSizePixel = 0,
-    Size = UDim2.new(1, 0, 0, 90),
-    Position = UDim2.new(1, 400, 1, -(Count * 100 + 20)),
-    Name = "NotificationFrame"
-  }, NotificationLayout)
+    Name = "Notification",
+    ZIndex = 100
+  }, Layout)
 
-  Custom:Create("UICorner", {CornerRadius = UDim.new(0, 8)}, NotificationFrame)
+  Custom:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, Notif)
 
-  -- Drop Shadow
-  local Shadow = Custom:Create("ImageLabel", {
+  -- Shadow
+  Custom:Create("ImageLabel", {
     Image = "rbxassetid://1316045217",
-    ImageColor3 = Color3.fromRGB(0, 0, 0),
-    ImageTransparency = 0.6,
+    ImageColor3 = Color3.fromRGB(0,0,0),
+    ImageTransparency = 0.65,
     ScaleType = Enum.ScaleType.Slice,
-    SliceCenter = Rect.new(10, 10, 118, 118),
+    SliceCenter = Rect.new(10,10,118,118),
     BackgroundTransparency = 1,
-    Size = UDim2.new(1, 30, 1, 30),
-    Position = UDim2.new(0.5, 0, 0.5, 0),
-    AnchorPoint = Vector2.new(0.5, 0.5),
+    Size = UDim2.new(1,40,1,40),
+    Position = UDim2.new(0.5,0,0.5,0),
+    AnchorPoint = Vector2.new(0.5,0.5),
     ZIndex = -1
-  }, NotificationFrame)
+  }, Notif)
 
-  local TopBar = Custom:Create("Frame", {
-    BackgroundColor3 = Color3.fromRGB(30, 30, 30),
-    Size = UDim2.new(1, 0, 0, 36),
-    BackgroundTransparency = 0,
+  -- Top Bar
+  local Top = Custom:Create("Frame", {
+    Size = UDim2.new(1,0,0,36),
+    BackgroundColor3 = Color3.fromRGB(30,30,30),
     BorderSizePixel = 0
-  }, NotificationFrame)
+  }, Notif)
+  Custom:Create("UICorner", {CornerRadius = UDim.new(0,10)}, Top)
 
-  Custom:Create("UICorner", {CornerRadius = UDim.new(0, 8)}, TopBar)
-
-  local TitleLabel = Custom:Create("TextLabel", {
+  Custom:Create("TextLabel", {
     Text = Title,
     Font = Enum.Font.GothamBold,
     TextColor3 = Custom.ColorRGB,
     TextSize = 15,
     TextXAlignment = Enum.TextXAlignment.Left,
     BackgroundTransparency = 1,
-    Size = UDim2.new(1, -80, 1, 0),
-    Position = UDim2.new(0, 15, 0, 0)
-  }, TopBar)
+    Position = UDim2.new(0,15,0,0),
+    Size = UDim2.new(1,-80,1,0)
+  }, Top)
 
-  local CloseBtn = Custom:Create("TextButton", {
+  -- Close Button
+  local Close = Custom:Create("TextButton", {
     Text = "×",
     Font = Enum.Font.GothamBold,
-    TextColor3 = Color3.fromRGB(200, 200, 200),
-    TextSize = 20,
+    TextColor3 = Color3.fromRGB(180,180,180),
+    TextSize = 22,
     BackgroundTransparency = 1,
-    Size = UDim2.new(0, 30, 0, 30),
-    Position = UDim2.new(1, -35, 0.5, -15)
-  }, TopBar)
+    Position = UDim2.new(1,-35,0,6),
+    Size = UDim2.new(0,25,0,25)
+  }, Top)
 
-  local DescLabel = Custom:Create("TextLabel", {
+  -- Description
+  Custom:Create("TextLabel", {
     Text = Description,
     Font = Enum.Font.Gotham,
-    TextColor3 = Color3.fromRGB(220, 220, 220),
+    TextColor3 = Color3.fromRGB(210,210,210),
     TextSize = 13,
     TextWrapped = true,
     TextXAlignment = Enum.TextXAlignment.Left,
     TextYAlignment = Enum.TextYAlignment.Top,
     BackgroundTransparency = 1,
-    Position = UDim2.new(0, 15, 0, 42),
-    Size = UDim2.new(1, -30, 1, -55)
-  }, NotificationFrame)
+    Position = UDim2.new(0,15,0,42),
+    Size = UDim2.new(1,-30,1,-52)
+  }, Notif)
 
-  -- Animasi Masuk (Slide from Right)
-  NotificationFrame.Position = UDim2.new(1, 400, 1, -(Count * 100 + 20))
-  TweenService:Create(NotificationFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-    Position = UDim2.new(1, -20, 1, -(Count * 100 + 20))
+  -- ==================== ANIMASI ====================
+  -- Slide In
+  TweenService:Create(Notif, TweenInfo.new(0.65, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Position = UDim2.new(1, -25, 1, YPos)
   }):Play()
 
   -- Auto Close
   task.delay(Duration, function()
-    if NotificationFrame.Parent then
-      TweenService:Create(NotificationFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-        Position = UDim2.new(1, 400, 1, NotificationFrame.Position.Y.Offset)
+    if Notif and Notif.Parent then
+      TweenService:Create(Notif, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Position = UDim2.new(1, 450, 1, YPos)
       }):Play()
-      
-      task.wait(0.4)
-      NotificationFrame:Destroy()
+      task.wait(0.45)
+      if Notif.Parent then Notif:Destroy() end
     end
   end)
 
-  -- Close Button
-  CloseBtn.MouseButton1Click:Connect(function()
-    TweenService:Create(NotificationFrame, TweenInfo.new(0.3), {Position = UDim2.new(1, 400, 1, NotificationFrame.Position.Y.Offset)}):Play()
-    task.wait(0.3)
-    NotificationFrame:Destroy()
+  -- Manual Close
+  Close.Activated:Connect(function()
+    if Notif and Notif.Parent then
+      TweenService:Create(Notif, TweenInfo.new(0.35, Enum.EasingStyle.Quad), {
+        Position = UDim2.new(1, 450, 1, YPos)
+      }):Play()
+      task.wait(0.4)
+      Notif:Destroy()
+    end
   end)
-
-  return {Close = function() 
-    if NotificationFrame.Parent then NotificationFrame:Destroy() end 
-  end}
 end
 
+-- Tambahkan wrapper agar bisa dipanggil dengan Library:Notify
+function Speed_Library:Notify(Config)
+  self:SetNotification(Config)
+end
+ 
 function Speed_Library:CreateWindow(Config)
   local Title = Config[1] or Config.Title or ""
   local Description = Config[2] or Config.Description or ""
