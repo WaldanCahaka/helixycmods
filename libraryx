@@ -90,13 +90,12 @@ end
 
 local Open_Close = OpenClose()
 
--- PERBAIKAN: Optimize MakeDraggable dengan debouncing
 local function MakeDraggable(topbarobject, object)
   local dragging = false
   local dragStart = nil
   local startPos = nil
   local lastUpdate = 0
-  local updateRate = 1/60 -- 60fps
+  local updateRate = 1/60
 
   topbarobject.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -179,7 +178,6 @@ function Speed_Library:SetNotification(Config)
     ResetOnSpawn = false
   }, RunService:IsStudio() and Player.PlayerGui or (gethui() or cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui")))
 
-  -- Layout untuk stacking notifikasi
   local Layout = Custom:Create("Frame", {
     AnchorPoint = Vector2.new(1, 1),
     BackgroundTransparency = 1,
@@ -188,7 +186,6 @@ function Speed_Library:SetNotification(Config)
     Name = "NotificationLayout"
   }, NotificationGui)
 
-  -- Hitung berapa notifikasi sudah ada
   local Existing = Layout:GetChildren()
   local Count = #Existing
   local YPos = -(Count * 110 + 20)
@@ -196,7 +193,7 @@ function Speed_Library:SetNotification(Config)
   local Notif = Custom:Create("Frame", {
     BackgroundColor3 = Color3.fromRGB(20, 20, 20),
     Size = UDim2.new(0, 340, 0, 95),
-    Position = UDim2.new(1, 450, 1, YPos),  -- Mulai dari luar kanan
+    Position = UDim2.new(1, 450, 1, YPos),
     BorderSizePixel = 0,
     Name = "Notification",
     ZIndex = 100
@@ -204,7 +201,6 @@ function Speed_Library:SetNotification(Config)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, Notif)
 
-  -- Shadow
   Custom:Create("ImageLabel", {
     Image = "rbxassetid://1316045217",
     ImageColor3 = Color3.fromRGB(0,0,0),
@@ -218,7 +214,6 @@ function Speed_Library:SetNotification(Config)
     ZIndex = -1
   }, Notif)
 
-  -- Top Bar
   local Top = Custom:Create("Frame", {
     Size = UDim2.new(1,0,0,36),
     BackgroundColor3 = Color3.fromRGB(30,30,30),
@@ -237,7 +232,6 @@ function Speed_Library:SetNotification(Config)
     Size = UDim2.new(1,-80,1,0)
   }, Top)
 
-  -- Close Button
   local Close = Custom:Create("TextButton", {
     Text = "×",
     Font = Enum.Font.GothamBold,
@@ -248,7 +242,6 @@ function Speed_Library:SetNotification(Config)
     Size = UDim2.new(0,25,0,25)
   }, Top)
 
-  -- Description
   Custom:Create("TextLabel", {
     Text = Description,
     Font = Enum.Font.Gotham,
@@ -262,8 +255,7 @@ function Speed_Library:SetNotification(Config)
     Size = UDim2.new(1,-30,1,-52)
   }, Notif)
 
-  -- ==================== ANIMASI ====================
-  -- Slide In
+  -- ==================== ANIMASI SLIDE IN DARI KANAN ====================
   TweenService:Create(Notif, TweenInfo.new(0.65, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
     Position = UDim2.new(1, -25, 1, YPos)
   }):Play()
@@ -291,7 +283,6 @@ function Speed_Library:SetNotification(Config)
   end)
 end
 
--- Tambahkan wrapper agar bisa dipanggil dengan Library:Notify
 function Speed_Library:Notify(Config)
   self:SetNotification(Config)
 end
@@ -566,7 +557,6 @@ function Speed_Library:CreateWindow(Config)
     ZIndex = 10
   }, DropShadowHolder)
 
-  -- Grip lines (segitiga ImGui style)
   local Grip = Custom:Create("Frame", {
     BackgroundTransparency = 1,
     Size = UDim2.new(1, 0, 1, 0),
@@ -589,7 +579,6 @@ function Speed_Library:CreateWindow(Config)
     }, Line)
   end
 
-  -- Hover Effect
   ResizeHandle.MouseEnter:Connect(function()
     for _, line in pairs(Grip:GetChildren()) do
       if line:IsA("Frame") then
@@ -606,7 +595,6 @@ function Speed_Library:CreateWindow(Config)
     end
   end)
 
-  -- ==================== RESIZE LOGIC ====================
   local ResizeActive = false
   local ResizeStartPos = nil
   local ResizeStartSize = nil
