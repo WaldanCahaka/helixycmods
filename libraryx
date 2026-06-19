@@ -641,111 +641,102 @@ function Speed_Library:CreateWindow(Config)
 
   DropShadowHolder.Size = UDim2.new(0, 115 + TextLabel.TextBounds.X + 1 + TextLabel1.TextBounds.X, 0, 350)
 
-  -- ==================== BORDER RESIZE (Drag Garis Merah) ====================
+  -- ==================== RESIZE DENGAN GARIS MERAH ====================
 
-local ResizeActive = false
-local ResizeStartPos = nil
-local ResizeStartSize = nil
-local CurrentResizeEdge = nil  -- "right", "bottom", "corner"
-
--- Buat invisible resize areas di border
-local RightBorder = Custom:Create("Frame", {
-    Name = "RightResizeBorder",
-    BackgroundTransparency = 1,
-    BorderSizePixel = 0,
-    Position = UDim2.new(1, -6, 0, 0),
-    Size = UDim2.new(0, 12, 1, 0),
-    ZIndex = 250,
-    Parent = DropShadowHolder
-})
-
-local BottomBorder = Custom:Create("Frame", {
-    Name = "BottomResizeBorder",
-    BackgroundTransparency = 1,
-    BorderSizePixel = 0,
-    Position = UDim2.new(0, 0, 1, -6),
-    Size = UDim2.new(1, 0, 0, 12),
-    ZIndex = 250,
-    Parent = DropShadowHolder
-})
-
-local CornerBorder = Custom:Create("Frame", {
-    Name = "CornerResizeBorder",
-    BackgroundTransparency = 1,
-    BorderSizePixel = 0,
-    Position = UDim2.new(1, -15, 1, -15),
-    Size = UDim2.new(0, 20, 0, 20),
-    ZIndex = 260,
-    Parent = DropShadowHolder
-})
-
--- Visual Border Merah (opsional, biar lebih keliatan)
-Custom:Create("UIStroke", {
+  -- UIStroke merah di Main (biar ada garis merah)
+  local MainStroke = Custom:Create("UIStroke", {
     Color = Custom.ColorRGB,
     Thickness = 2.5,
-    Transparency = 0.3
-}, Main)
+    Transparency = 0.4,
+    ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+  }, Main)
 
--- Fungsi Resize
-local function StartResize(input, edge)
+  -- Area Resize (Invisible tapi bisa di-drag)
+  local RightResize = Custom:Create("Frame", {
+    Name = "RightResize",
+    BackgroundTransparency = 1,
+    Size = UDim2.new(0, 10, 1, 0),
+    Position = UDim2.new(1, -5, 0, 0),
+    ZIndex = 300,
+    Parent = DropShadowHolder
+  })
+
+  local BottomResize = Custom:Create("Frame", {
+    Name = "BottomResize",
+    BackgroundTransparency = 1,
+    Size = UDim2.new(1, 0, 0, 10),
+    Position = UDim2.new(0, 0, 1, -5),
+    ZIndex = 300,
+    Parent = DropShadowHolder
+  })
+
+  local CornerResize = Custom:Create("Frame", {
+    Name = "CornerResize",
+    BackgroundTransparency = 1,
+    Size = UDim2.new(0, 20, 0, 20),
+    Position = UDim2.new(1, -15, 1, -15),
+    ZIndex = 310,
+    Parent = DropShadowHolder
+  })
+
+  -- Visual garis merah lebih jelas saat hover
+  local function AddHoverEffect(frame)
+    frame.MouseEnter:Connect(function()
+      TweenService:Create(MainStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
+    end)
+    frame.MouseLeave:Connect(function()
+      TweenService:Create(MainStroke, TweenInfo.new(0.2), {Transparency = 0.4}):Play()
+    end)
+  end
+
+  AddHoverEffect(RightResize)
+  AddHoverEffect(BottomResize)
+  AddHoverEffect(CornerResize)
+
+  -- Resize Logic
+  local ResizeActive = false
+  local ResizeStartPos = nil
+  local ResizeStartSize = nil
+  local ResizeType = nil -- "right", "bottom", "corner"
+
+  local function BeginResize(input, type)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        ResizeActive = true
-        CurrentResizeEdge = edge
-        ResizeStartPos = input.Position
-        ResizeStartSize = DropShadowHolder.Size
+      ResizeActive = true
+      ResizeType = type
+      ResizeStartPos = input.Position
+      ResizeStartSize = DropShadowHolder.Size
     end
-end
+  end
 
-RightBorder.InputBegan:Connect(function(input) StartResize(input, "right") end)
-BottomBorder.InputBegan:Connect(function(input) StartResize(input, "bottom") end)
-CornerBorder.InputBegan:Connect(function(input) StartResize(input, "corner") end)
+  RightResize.InputBegan:Connect(function(i) BeginResize(i, "right") end)
+  BottomResize.InputBegan:Connect(function(i) BeginResize(i, "bottom") end)
+  CornerResize.InputBegan:Connect(function(i) BeginResize(i, "corner") end)
 
-UserInputService.InputChanged:Connect(function(input)
+  UserInputService.InputChanged:Connect(function(input)
     if not ResizeActive then return end
     if not (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then return end
 
     local delta = input.Position - ResizeStartPos
-    local newWidth = ResizeStartSize.X.Offset
-    local newHeight = ResizeStartSize.Y.Offset
+    local newW = ResizeStartSize.X.Offset
+    local newH = ResizeStartSize.Y.Offset
 
-    if CurrentResizeEdge == "right" or CurrentResizeEdge == "corner" then
-        newWidth = math.max(380, ResizeStartSize.X.Offset + delta.X)
+    if ResizeType == "right" or ResizeType == "corner" then
+      newW = math.max(420, ResizeStartSize.X.Offset + delta.X)
     end
-    if CurrentResizeEdge == "bottom" or CurrentResizeEdge == "corner" then
-        newHeight = math.max(300, ResizeStartSize.Y.Offset + delta.Y)
+    if ResizeType == "bottom" or ResizeType == "corner" then
+      newH = math.max(320, ResizeStartSize.Y.Offset + delta.Y)
     end
 
-    DropShadowHolder.Size = UDim2.new(0, newWidth, 0, newHeight)
-    DropShadow.Size = UDim2.new(0, newWidth, 0, newHeight)
-    Main.Size = UDim2.new(0, newWidth, 0, newHeight)
+    DropShadowHolder.Size = UDim2.new(0, newW, 0, newH)
+    DropShadow.Size = UDim2.new(0, newW, 0, newH)
+    Main.Size = UDim2.new(0, newW, 0, newH)
+  end)
 
-    -- Update ukuran Layers agar tidak rusak
-    Layers.Size = UDim2.new(1, -(TabWidth + 9 + 18), 1, -59)
-end)
-
-UserInputService.InputEnded:Connect(function(input)
+  UserInputService.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        ResizeActive = false
-        CurrentResizeEdge = nil
+      ResizeActive = false
     end
-end)
-
--- Hover Effect (biar cursor berubah + border lebih terlihat)
-local function HoverBorder(frame, cursor)
-    frame.MouseEnter:Connect(function()
-        if cursor == "Size" then
-            -- Roblox otomatis ganti cursor kalau frame ini aktif
-        end
-        TweenService:Create(Main.UIStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
-    end)
-    frame.MouseLeave:Connect(function()
-        TweenService:Create(Main.UIStroke, TweenInfo.new(0.2), {Transparency = 0.3}):Play()
-    end)
-end
-
-HoverBorder(RightBorder, "Size")
-HoverBorder(BottomBorder, "Size")
-HoverBorder(CornerBorder, "Size")
+  end)
 
   MakeDraggable(Top, DropShadowHolder)
 
