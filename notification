@@ -1,0 +1,167 @@
+local TweenService = game:GetService("TweenService")
+local Player = game:GetService("Players").LocalPlayer
+
+local ActiveNotifications = {}
+
+local function RepositionNotifications()
+    local notifHeight = 85
+    local spacing = 10
+
+    for i, frame in ipairs(ActiveNotifications) do
+        local targetY = 40 + ((i - 1) * (notifHeight + spacing))
+
+        TweenService:Create(
+            frame,
+            TweenInfo.new(
+                0.25,
+                Enum.EasingStyle.Quart,
+                Enum.EasingDirection.Out
+            ),
+            {
+                Position = UDim2.new(1, -320, 0, targetY)
+            }
+        ):Play()
+    end
+end
+
+local function ShowNotification(title, description, duration)
+    duration = duration or 5
+
+    local ScreenGui = Player.PlayerGui:FindFirstChild("HelixNotifications")
+
+    if not ScreenGui then
+        ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "HelixNotifications"
+        ScreenGui.ResetOnSpawn = false
+        ScreenGui.Parent = Player.PlayerGui
+    end
+
+    local notifHeight = 85
+    local spacing = 10
+    local index = #ActiveNotifications + 1
+    local targetY = 40 + ((index - 1) * (notifHeight + spacing))
+
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 300, 0, notifHeight)
+    Frame.Position = UDim2.new(1, 40, 0, targetY)
+    Frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+    Frame.BackgroundTransparency = 0.05
+    Frame.BorderSizePixel = 0
+    Frame.Parent = ScreenGui
+
+    table.insert(ActiveNotifications, Frame)
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 14)
+    Corner.Parent = Frame
+
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Color = Color3.fromRGB(255, 45, 45)
+    Stroke.Thickness = 1
+    Stroke.Parent = Frame
+
+    local Title = Instance.new("TextLabel")
+    Title.BackgroundTransparency = 1
+    Title.Position = UDim2.new(0, 15, 0, 10)
+    Title.Size = UDim2.new(1, -25, 0, 22)
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 18
+    Title.TextColor3 = Color3.fromRGB(255, 60, 60)
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Text = title
+    Title.Parent = Frame
+
+    local Desc = Instance.new("TextLabel")
+    Desc.BackgroundTransparency = 1
+    Desc.Position = UDim2.new(0, 15, 0, 35)
+    Desc.Size = UDim2.new(1, -25, 0, 24)
+    Desc.Font = Enum.Font.GothamBold
+    Desc.TextSize = 13
+    Desc.TextColor3 = Color3.fromRGB(235,235,235)
+    Desc.TextWrapped = true
+    Desc.TextXAlignment = Enum.TextXAlignment.Left
+    Desc.TextYAlignment = Enum.TextYAlignment.Top
+    Desc.Text = description
+    Desc.Parent = Frame
+
+    local ProgressBG = Instance.new("Frame")
+    ProgressBG.Size = UDim2.new(1, -16, 0, 4)
+    ProgressBG.Position = UDim2.new(0, 8, 1, -10)
+    ProgressBG.BackgroundColor3 = Color3.fromRGB(35,35,35)
+    ProgressBG.BorderSizePixel = 0
+    ProgressBG.Parent = Frame
+
+    local ProgressBGCorner = Instance.new("UICorner")
+    ProgressBGCorner.CornerRadius = UDim.new(1,0)
+    ProgressBGCorner.Parent = ProgressBG
+
+    local Progress = Instance.new("Frame")
+    Progress.Size = UDim2.new(1,0,1,0)
+    Progress.BackgroundColor3 = Color3.fromRGB(255,45,45)
+    Progress.BorderSizePixel = 0
+    Progress.Parent = ProgressBG
+
+    local ProgressCorner = Instance.new("UICorner")
+    ProgressCorner.CornerRadius = UDim.new(1,0)
+    ProgressCorner.Parent = Progress
+
+    TweenService:Create(
+        Frame,
+        TweenInfo.new(
+            0.45,
+            Enum.EasingStyle.Quint,
+            Enum.EasingDirection.Out
+        ),
+        {
+            Position = UDim2.new(1, -320, 0, targetY)
+        }
+    ):Play()
+
+    TweenService:Create(
+        Progress,
+        TweenInfo.new(
+            duration,
+            Enum.EasingStyle.Linear
+        ),
+        {
+            Size = UDim2.new(0,0,1,0)
+        }
+    ):Play()
+
+    task.delay(duration,function()
+
+        local SlideOut = TweenService:Create(
+            Frame,
+            TweenInfo.new(
+                0.35,
+                Enum.EasingStyle.Quint,
+                Enum.EasingDirection.In
+            ),
+            {
+                Position = UDim2.new(1, 40, 0, targetY)
+            }
+        )
+
+        SlideOut:Play()
+
+        SlideOut.Completed:Connect(function()
+
+            for i,v in ipairs(ActiveNotifications) do
+                if v == Frame then
+                    table.remove(ActiveNotifications, i)
+                    break
+                end
+            end
+
+            Frame:Destroy()
+
+            RepositionNotifications()
+
+            if #ActiveNotifications == 0 then
+                ScreenGui:Destroy()
+            end
+
+        end)
+
+    end)
+end
