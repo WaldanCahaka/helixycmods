@@ -678,6 +678,16 @@ UserInputService.InputChanged:Connect(function(input)
   DropShadowHolder.Size = UDim2.new(0, newW, 0, newH)
   DropShadow.Size = UDim2.new(0, newW, 0, newH)
   Main.Size = UDim2.new(0, newW, 0, newH)
+  
+  -- Update resize handle positions
+  RightResize.Position = UDim2.new(1, -5, 0, 0)
+  RightResize.Size = UDim2.new(0, 10, 1, 0)
+  
+  BottomResize.Position = UDim2.new(0, 0, 1, -5)
+  BottomResize.Size = UDim2.new(1, 0, 0, 10)
+  
+  CornerResize.Position = UDim2.new(1, -15, 1, -15)
+  CornerResize.Size = UDim2.new(0, 20, 0, 20)
 end)
 
 UserInputService.InputEnded:Connect(function(input)
