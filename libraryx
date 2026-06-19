@@ -641,102 +641,60 @@ function Speed_Library:CreateWindow(Config)
 
   DropShadowHolder.Size = UDim2.new(0, 115 + TextLabel.TextBounds.X + 1 + TextLabel1.TextBounds.X, 0, 350)
 
-  -- ==================== RESIZE DENGAN GARIS MERAH ====================
-
-  -- UIStroke merah di Main (biar ada garis merah)
-  local MainStroke = Custom:Create("UIStroke", {
-    Color = Custom.ColorRGB,
-    Thickness = 2.5,
-    Transparency = 0.4,
-    ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-  }, Main)
-
-  -- Area Resize (Invisible tapi bisa di-drag)
-  local RightResize = Custom:Create("Frame", {
-    Name = "RightResize",
-    BackgroundTransparency = 1,
-    Size = UDim2.new(0, 10, 1, 0),
-    Position = UDim2.new(1, -5, 0, 0),
-    ZIndex = 300,
-    Parent = DropShadowHolder
-  })
-
-  local BottomResize = Custom:Create("Frame", {
-    Name = "BottomResize",
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 10),
-    Position = UDim2.new(0, 0, 1, -5),
-    ZIndex = 300,
-    Parent = DropShadowHolder
-  })
-
-  local CornerResize = Custom:Create("Frame", {
-    Name = "CornerResize",
-    BackgroundTransparency = 1,
-    Size = UDim2.new(0, 20, 0, 20),
-    Position = UDim2.new(1, -15, 1, -15),
-    ZIndex = 310,
-    Parent = DropShadowHolder
-  })
-
-  -- Visual garis merah lebih jelas saat hover
-  local function AddHoverEffect(frame)
-    frame.MouseEnter:Connect(function()
-      TweenService:Create(MainStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
-    end)
-    frame.MouseLeave:Connect(function()
-      TweenService:Create(MainStroke, TweenInfo.new(0.2), {Transparency = 0.4}):Play()
-    end)
-  end
-
-  AddHoverEffect(RightResize)
-  AddHoverEffect(BottomResize)
-  AddHoverEffect(CornerResize)
-
   -- Resize Logic
-  local ResizeActive = false
-  local ResizeStartPos = nil
-  local ResizeStartSize = nil
-  local ResizeType = nil -- "right", "bottom", "corner"
+local ResizeActive = false
+local ResizeStartPos = nil
+local ResizeStartSize = nil
+local ResizeType = nil -- "right", "bottom", "corner"
 
-  local function BeginResize(input, type)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-      ResizeActive = true
-      ResizeType = type
-      ResizeStartPos = input.Position
-      ResizeStartSize = DropShadowHolder.Size
-    end
+local function BeginResize(input, type)
+  if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+    ResizeActive = true
+    ResizeType = type
+    ResizeStartPos = input.Position
+    ResizeStartSize = DropShadowHolder.Size
+  end
+end
+
+RightResize.InputBegan:Connect(function(i) BeginResize(i, "right") end)
+BottomResize.InputBegan:Connect(function(i) BeginResize(i, "bottom") end)
+CornerResize.InputBegan:Connect(function(i) BeginResize(i, "corner") end)
+
+UserInputService.InputChanged:Connect(function(input)
+  if not ResizeActive then return end
+  if not (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then return end
+
+  local delta = input.Position - ResizeStartPos
+  local newW = ResizeStartSize.X.Offset
+  local newH = ResizeStartSize.Y.Offset
+
+  if ResizeType == "right" or ResizeType == "corner" then
+    newW = math.max(420, ResizeStartSize.X.Offset + delta.X)
+  end
+  if ResizeType == "bottom" or ResizeType == "corner" then
+    newH = math.max(320, ResizeStartSize.Y.Offset + delta.Y)
   end
 
-  RightResize.InputBegan:Connect(function(i) BeginResize(i, "right") end)
-  BottomResize.InputBegan:Connect(function(i) BeginResize(i, "bottom") end)
-  CornerResize.InputBegan:Connect(function(i) BeginResize(i, "corner") end)
+  DropShadowHolder.Size = UDim2.new(0, newW, 0, newH)
+  DropShadow.Size = UDim2.new(0, newW, 0, newH)
+  Main.Size = UDim2.new(0, newW, 0, newH)
+  
+  -- Update resize handle positions
+  RightResize.Position = UDim2.new(1, -5, 0, 0)
+  RightResize.Size = UDim2.new(0, 10, 1, 0)
+  
+  BottomResize.Position = UDim2.new(0, 0, 1, -5)
+  BottomResize.Size = UDim2.new(1, 0, 0, 10)
+  
+  CornerResize.Position = UDim2.new(1, -15, 1, -15)
+  CornerResize.Size = UDim2.new(0, 20, 0, 20)
+end)
 
-  UserInputService.InputChanged:Connect(function(input)
-    if not ResizeActive then return end
-    if not (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then return end
-
-    local delta = input.Position - ResizeStartPos
-    local newW = ResizeStartSize.X.Offset
-    local newH = ResizeStartSize.Y.Offset
-
-    if ResizeType == "right" or ResizeType == "corner" then
-      newW = math.max(420, ResizeStartSize.X.Offset + delta.X)
-    end
-    if ResizeType == "bottom" or ResizeType == "corner" then
-      newH = math.max(320, ResizeStartSize.Y.Offset + delta.Y)
-    end
-
-    DropShadowHolder.Size = UDim2.new(0, newW, 0, newH)
-    DropShadow.Size = UDim2.new(0, newW, 0, newH)
-    Main.Size = UDim2.new(0, newW, 0, newH)
-  end)
-
-  UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-      ResizeActive = false
-    end
-  end)
+UserInputService.InputEnded:Connect(function(input)
+  if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+    ResizeActive = false
+  end
+end)
 
   MakeDraggable(Top, DropShadowHolder)
 
