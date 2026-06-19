@@ -669,11 +669,11 @@ UserInputService.InputChanged:Connect(function(input)
   local newH = ResizeStartSize.Y.Offset
 
   if ResizeType == "right" or ResizeType == "corner" then
-    newW = math.max(420, ResizeStartSize.X.Offset + delta.X)
-  end
-  if ResizeType == "bottom" or ResizeType == "corner" then
-    newH = math.max(320, ResizeStartSize.Y.Offset + delta.Y)
-  end
+  newW = math.max(SizeUi.X.Offset, ResizeStartSize.X.Offset + delta.X)
+end
+if ResizeType == "bottom" or ResizeType == "corner" then
+  newH = math.max(SizeUi.Y.Offset, ResizeStartSize.Y.Offset + delta.Y)
+end
 
   DropShadowHolder.Size = UDim2.new(0, newW, 0, newH)
   DropShadow.Size = UDim2.new(0, newW, 0, newH)
