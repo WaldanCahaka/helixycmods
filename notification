@@ -1,3 +1,7 @@
+local Notification = {}
+
+function Notification:Notify(title, description, duration)
+    -- isi kode ShowNotification di sini
 local TweenService = game:GetService("TweenService")
 local Player = game:GetService("Players").LocalPlayer
 
@@ -165,3 +169,6 @@ local function ShowNotification(title, description, duration)
 
     end)
 end
+end
+
+return Notification
