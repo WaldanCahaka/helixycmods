@@ -641,19 +641,15 @@ function Speed_Library:CreateWindow(Config)
 
   DropShadowHolder.Size = UDim2.new(0, 115 + TextLabel.TextBounds.X + 1 + TextLabel1.TextBounds.X, 0, 350)
 
-  -- ==================== BAGIAN RESIZE (SUDAH DIPERBAIKI) ====================
--- ... (kode di atas tetap sama sampai sebelum ResizeHandle)
-
-  -- Resize Handle (Pojok Kanan Bawah)
+  -- ==================== RESIZE HANDLE (SUDAH DISAMAIN DENGAN GAMBAR 1) ====================
   local ResizeHandle = Custom:Create("Frame", {
     AnchorPoint = Vector2.new(1, 1),
-    BackgroundTransparency = 0.7,           -- Dibuat agak terlihat
-    BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+    BackgroundTransparency = 1,
     BorderSizePixel = 0,
     Position = UDim2.new(1, 0, 1, 0),
-    Size = UDim2.new(0, 30, 0, 30),        -- Sedikit diperbesar
+    Size = UDim2.new(0, 35, 0, 35),
     Name = "ResizeHandle",
-    ZIndex = 100,                           -- ZIndex tinggi agar selalu di atas
+    ZIndex = 200
   }, DropShadowHolder)
 
   local Grip = Custom:Create("Frame", {
@@ -662,70 +658,60 @@ function Speed_Library:CreateWindow(Config)
     Name = "Grip"
   }, ResizeHandle)
 
-  -- Garis resize (diperbaiki posisinya)
+  -- Grip Lines (Merah seperti di gambar)
   for i = 1, 3 do
     local Line = Custom:Create("Frame", {
-      BackgroundColor3 = Custom.ColorRGB,
+      BackgroundColor3 = Custom.ColorRGB,  -- Warna merah
       BorderSizePixel = 0,
-      Size = UDim2.new(0, 3, 0, 18),
+      Size = UDim2.new(0, 2, 0, 16),
       Rotation = 45,
-      Position = UDim2.new(1, -8 - (i * 6), 1, -8),
+      Position = UDim2.new(1, -6 - (i * 5), 1, -6),
       AnchorPoint = Vector2.new(1, 1),
       Name = "GripLine" .. i,
-      ZIndex = 101
+      ZIndex = 201
     }, Grip)
     Custom:Create("UICorner", {CornerRadius = UDim.new(0, 1)}, Line)
   end
 
   -- Hover Effect
   ResizeHandle.MouseEnter:Connect(function()
-    ResizeHandle.BackgroundTransparency = 0.4
     for _, line in pairs(Grip:GetChildren()) do
       if line:IsA("Frame") then
-        TweenService:Create(line, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+        TweenService:Create(line, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
       end
     end
   end)
 
   ResizeHandle.MouseLeave:Connect(function()
-    ResizeHandle.BackgroundTransparency = 0.7
     for _, line in pairs(Grip:GetChildren()) do
       if line:IsA("Frame") then
-        TweenService:Create(line, TweenInfo.new(0.15), {BackgroundColor3 = Custom.ColorRGB}):Play()
+        TweenService:Create(line, TweenInfo.new(0.2), {BackgroundColor3 = Custom.ColorRGB}):Play()
       end
     end
   end)
 
-  -- Logic Resize (tetap sama, tapi ditambah safety)
+  -- Resize Logic
   local ResizeActive = false
   local ResizeStartPos = nil
   local ResizeStartSize = nil
-  local lastResizeUpdate = 0
-  local resizeUpdateRate = 1/60
 
   ResizeHandle.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
       ResizeActive = true
       ResizeStartPos = input.Position
       ResizeStartSize = DropShadowHolder.Size
-      lastResizeUpdate = tick()
     end
   end)
 
   UserInputService.InputChanged:Connect(function(input)
     if ResizeActive and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-      local currentTime = tick()
-      if currentTime - lastResizeUpdate >= resizeUpdateRate then
-        local delta = input.Position - ResizeStartPos
-        local newWidth = math.max(300, ResizeStartSize.X.Offset + delta.X)
-        local newHeight = math.max(250, ResizeStartSize.Y.Offset + delta.Y)
-        
-        DropShadowHolder.Size = UDim2.new(0, newWidth, 0, newHeight)
-        DropShadow.Size = UDim2.new(0, newWidth, 0, newHeight)
-        Main.Size = UDim2.new(0, newWidth, 0, newHeight)
-        
-        lastResizeUpdate = currentTime
-      end
+      local delta = input.Position - ResizeStartPos
+      local newWidth = math.max(300, ResizeStartSize.X.Offset + delta.X)
+      local newHeight = math.max(280, ResizeStartSize.Y.Offset + delta.Y)
+      
+      DropShadowHolder.Size = UDim2.new(0, newWidth, 0, newHeight)
+      DropShadow.Size = UDim2.new(0, newWidth, 0, newHeight)
+      Main.Size = UDim2.new(0, newWidth, 0, newHeight)
     end
   end)
 
