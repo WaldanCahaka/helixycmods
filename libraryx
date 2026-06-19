@@ -288,6 +288,123 @@ end
 function Speed_Library:Notify(Config)
   self:SetNotification(Config)
 end
+
+-- Tambahkan ini ke dalam Custom table (setelah function Custom:EnabledAFK())
+
+function Custom:Notify(Config)
+  local Title = Config.Title or Config[1] or "Notifikasi"
+  local Description = Config.Description or Config.Content or Config[2] or "Tidak ada deskripsi"
+  local Duration = Config.Duration or Config[5] or 3.5
+
+  local NotificationGui = self:Create("ScreenGui", {
+    ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+    ResetOnSpawn = false
+  }, RunService:IsStudio() and Player.PlayerGui or (gethui() or cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui")))
+
+  local Layout = self:Create("Frame", {
+    AnchorPoint = Vector2.new(1, 1),
+    BackgroundTransparency = 1,
+    Position = UDim2.new(1, -25, 1, -25),
+    Size = UDim2.new(0, 340, 1, 0),
+    Name = "NotificationLayout"
+  }, NotificationGui)
+
+  local Existing = Layout:GetChildren()
+  local Count = #Existing
+  local YPos = -(Count * 110 + 20)
+
+  local Notif = self:Create("Frame", {
+    BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+    Size = UDim2.new(0, 340, 0, 95),
+    Position = UDim2.new(1, 450, 1, YPos),
+    BorderSizePixel = 0,
+    Name = "Notification",
+    ZIndex = 100
+  }, Layout)
+
+  self:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, Notif)
+
+  self:Create("ImageLabel", {
+    Image = "rbxassetid://1316045217",
+    ImageColor3 = Color3.fromRGB(0,0,0),
+    ImageTransparency = 0.65,
+    ScaleType = Enum.ScaleType.Slice,
+    SliceCenter = Rect.new(10,10,118,118),
+    BackgroundTransparency = 1,
+    Size = UDim2.new(1,40,1,40),
+    Position = UDim2.new(0.5,0,0.5,0),
+    AnchorPoint = Vector2.new(0.5,0.5),
+    ZIndex = -1
+  }, Notif)
+
+  local Top = self:Create("Frame", {
+    Size = UDim2.new(1,0,0,36),
+    BackgroundColor3 = Color3.fromRGB(30,30,30),
+    BorderSizePixel = 0
+  }, Notif)
+  self:Create("UICorner", {CornerRadius = UDim.new(0,10)}, Top)
+
+  self:Create("TextLabel", {
+    Text = Title,
+    Font = Enum.Font.GothamBold,
+    TextColor3 = self.ColorRGB,
+    TextSize = 15,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    BackgroundTransparency = 1,
+    Position = UDim2.new(0,15,0,0),
+    Size = UDim2.new(1,-80,1,0)
+  }, Top)
+
+  local Close = self:Create("TextButton", {
+    Text = "×",
+    Font = Enum.Font.GothamBold,
+    TextColor3 = Color3.fromRGB(180,180,180),
+    TextSize = 22,
+    BackgroundTransparency = 1,
+    Position = UDim2.new(1,-35,0,6),
+    Size = UDim2.new(0,25,0,25)
+  }, Top)
+
+  self:Create("TextLabel", {
+    Text = Description,
+    Font = Enum.Font.Gotham,
+    TextColor3 = Color3.fromRGB(210,210,210),
+    TextSize = 13,
+    TextWrapped = true,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Top,
+    BackgroundTransparency = 1,
+    Position = UDim2.new(0,15,0,42),
+    Size = UDim2.new(1,-30,1,-52)
+  }, Notif)
+
+  -- Animasi slide in
+  TweenService:Create(Notif, TweenInfo.new(0.65, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Position = UDim2.new(1, -25, 1, YPos)
+  }):Play()
+
+  -- Auto close
+  task.delay(Duration, function()
+    if Notif and Notif.Parent then
+      TweenService:Create(Notif, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Position = UDim2.new(1, 450, 1, YPos)
+      }):Play()
+      task.wait(0.45)
+      if Notif.Parent then Notif:Destroy() end
+    end
+  end)
+
+  -- Manual close
+  Close.Activated:Connect(function()
+    if Notif and Notif.Parent then
+      TweenService:Create(Notif, TweenInfo.new(0.35, Enum.EasingStyle.Quad), {
+        Position = UDim2.new(1, 450, 1, YPos)
+      }):Play()
+      task.wait(0.4)
+      Notif:Destroy()
+    end
+  end)
+end
  
 function Speed_Library:CreateWindow(Config)
   local Title = Config[1] or Config.Title or ""
@@ -1375,16 +1492,6 @@ function Speed_Library:CreateWindow(Config)
         Custom:Create("UICorner", {
           CornerRadius = UDim.new(0, 4)
         }, Toggle)
-        
-        local function ShowNotification(title, description, duration)
-    duration = duration or 3
-    
-    Speed_Library:Notify({
-        Title = title,
-        Description = description,
-        Duration = duration
-    })
-end
 
         local ToggleTitle = Custom:Create("TextLabel", {
 					Name = "ToggleTitle",
