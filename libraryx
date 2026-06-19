@@ -641,11 +641,63 @@ function Speed_Library:CreateWindow(Config)
 
   DropShadowHolder.Size = UDim2.new(0, 115 + TextLabel.TextBounds.X + 1 + TextLabel1.TextBounds.X, 0, 350)
 
-  -- Resize Logic
+-- ==================== RESIZE DENGAN GARIS MERAH ====================
+
+-- UIStroke merah di Main (biar ada garis merah)
+local MainStroke = Custom:Create("UIStroke", {
+  Color = Custom.ColorRGB,
+  Thickness = 2.5,
+  Transparency = 0.4,
+  ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+}, Main)
+
+-- Area Resize (Invisible tapi bisa di-drag)
+local RightResize = Custom:Create("Frame", {
+  Name = "RightResize",
+  BackgroundTransparency = 1,
+  Size = UDim2.new(0, 10, 1, 0),
+  Position = UDim2.new(1, -5, 0, 0),
+  ZIndex = 300,
+  Parent = DropShadowHolder
+})
+
+local BottomResize = Custom:Create("Frame", {
+  Name = "BottomResize",
+  BackgroundTransparency = 1,
+  Size = UDim2.new(1, 0, 0, 10),
+  Position = UDim2.new(0, 0, 1, -5),
+  ZIndex = 300,
+  Parent = DropShadowHolder
+})
+
+local CornerResize = Custom:Create("Frame", {
+  Name = "CornerResize",
+  BackgroundTransparency = 1,
+  Size = UDim2.new(0, 20, 0, 20),
+  Position = UDim2.new(1, -15, 1, -15),
+  ZIndex = 310,
+  Parent = DropShadowHolder
+})
+
+-- Visual garis merah lebih jelas saat hover
+local function AddHoverEffect(frame)
+  frame.MouseEnter:Connect(function()
+    TweenService:Create(MainStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
+  end)
+  frame.MouseLeave:Connect(function()
+    TweenService:Create(MainStroke, TweenInfo.new(0.2), {Transparency = 0.4}):Play()
+  end)
+end
+
+AddHoverEffect(RightResize)
+AddHoverEffect(BottomResize)
+AddHoverEffect(CornerResize)
+
+-- Resize Logic
 local ResizeActive = false
 local ResizeStartPos = nil
 local ResizeStartSize = nil
-local ResizeType = nil -- "right", "bottom", "corner"
+local ResizeType = nil
 
 local function BeginResize(input, type)
   if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -669,25 +721,15 @@ UserInputService.InputChanged:Connect(function(input)
   local newH = ResizeStartSize.Y.Offset
 
   if ResizeType == "right" or ResizeType == "corner" then
-    newW = math.max(420, ResizeStartSize.X.Offset + delta.X)
+    newW = math.max(SizeUi.X.Offset, ResizeStartSize.X.Offset + delta.X)
   end
   if ResizeType == "bottom" or ResizeType == "corner" then
-    newH = math.max(320, ResizeStartSize.Y.Offset + delta.Y)
+    newH = math.max(SizeUi.Y.Offset, ResizeStartSize.Y.Offset + delta.Y)
   end
 
   DropShadowHolder.Size = UDim2.new(0, newW, 0, newH)
   DropShadow.Size = UDim2.new(0, newW, 0, newH)
   Main.Size = UDim2.new(0, newW, 0, newH)
-  
-  -- Update resize handle positions
-  RightResize.Position = UDim2.new(1, -5, 0, 0)
-  RightResize.Size = UDim2.new(0, 10, 1, 0)
-  
-  BottomResize.Position = UDim2.new(0, 0, 1, -5)
-  BottomResize.Size = UDim2.new(1, 0, 0, 10)
-  
-  CornerResize.Position = UDim2.new(1, -15, 1, -15)
-  CornerResize.Size = UDim2.new(0, 20, 0, 20)
 end)
 
 UserInputService.InputEnded:Connect(function(input)
@@ -696,7 +738,7 @@ UserInputService.InputEnded:Connect(function(input)
   end
 end)
 
-  MakeDraggable(Top, DropShadowHolder)
+MakeDraggable(Top, DropShadowHolder)
 
   local MoreBlur = Custom:Create("Frame", {
     AnchorPoint = Vector2.new(1, 1),
