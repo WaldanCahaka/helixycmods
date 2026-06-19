@@ -653,21 +653,21 @@ local MainStroke = Custom:Create("UIStroke", {
 
 -- Area Resize (Invisible tapi bisa di-drag)
 local RightResize = Custom:Create("Frame", {
-    Name = "RightResize",
-    BackgroundTransparency = 1,
-    Size = UDim2.new(0, 10, 1, 0),
-    Position = UDim2.new(0, SizeUi.X.Offset - 5, 0, 0),
-    ZIndex = 300,
-    Parent = DropShadowHolder
+  Name = "RightResize",
+  BackgroundTransparency = 1,
+  Size = UDim2.new(0, 10, 1, 0),
+  Position = UDim2.new(1, -5, 0, 0),
+  ZIndex = 300,
+  Parent = DropShadowHolder
 })
 
 local BottomResize = Custom:Create("Frame", {
-    Name = "BottomResize",
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 10),
-    Position = UDim2.new(0, 0, 0, SizeUi.Y.Offset - 5),
-    ZIndex = 300,
-    Parent = DropShadowHolder
+  Name = "BottomResize",
+  BackgroundTransparency = 1,
+  Size = UDim2.new(1, 0, 0, 10),
+  Position = UDim2.new(0, 0, 1, -5),
+  ZIndex = 300,
+  Parent = DropShadowHolder
 })
 
 local CornerResize = Custom:Create("Frame", {
@@ -721,10 +721,10 @@ UserInputService.InputChanged:Connect(function(input)
   local newH = ResizeStartSize.Y.Offset
 
   if ResizeType == "right" or ResizeType == "corner" then
-    newW = math.max(150, math.min(ResizeStartSize.X.Offset + delta.X, SizeUi.X.Offset + 150))
+    newW = math.max(SizeUi.X.Offset, ResizeStartSize.X.Offset + delta.X)
   end
   if ResizeType == "bottom" or ResizeType == "corner" then
-    newH = math.max(150, math.min(ResizeStartSize.Y.Offset + delta.Y, SizeUi.Y.Offset + 150))
+    newH = math.max(SizeUi.Y.Offset, ResizeStartSize.Y.Offset + delta.Y)
   end
 
   DropShadowHolder.Size = UDim2.new(0, newW, 0, newH)
