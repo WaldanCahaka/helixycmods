@@ -404,7 +404,7 @@ function Speed_Library:CreateWindow(Config)
   local Title = Config[1] or Config.Title or ""
   local Description = Config[2] or Config.Description or ""
   local TabWidth = Config[3] or Config["Tab Width"] or 120
-  local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(550, 315)
+  local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(500, 260)
 
   local Funcs = {}
 
