@@ -2146,8 +2146,17 @@ function Speed_Library:CreateWindow(Config)
           -- Dragging
           local draggingMap, draggingHue = false, false
 
-          SatVibMap.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then draggingMap = true end end)
-          HueSlider.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then draggingHue = true end end)
+          SatVibMap.InputBegan:Connect(function(i) 
+            if i.UserInputType == Enum.UserInputType.MouseButton1 then 
+              draggingMap = true 
+            end 
+          end)
+
+          HueSlider.InputBegan:Connect(function(i) 
+            if i.UserInputType == Enum.UserInputType.MouseButton1 then 
+              draggingHue = true 
+            end 
+          end)
 
           UserInputService.InputChanged:Connect(function(input)
             if input.UserInputType \~= Enum.UserInputType.MouseMovement then return end
