@@ -1994,6 +1994,7 @@ function Speed_Library:CreateWindow(Config)
         local Callback = Config[4] or Config.Callback or function() end
         local Funcs_Colorpicker = {Value = Default}
 
+        -- ========== ELEMENT DI SECTION (baris kecil + preview warna) ==========
         local Colorpicker = Custom:Create("Frame", {
           BackgroundColor3 = Color3.fromRGB(255, 255, 255),
           BackgroundTransparency = 0.935,
@@ -2017,7 +2018,6 @@ function Speed_Library:CreateWindow(Config)
           BorderSizePixel = 0,
           Position = UDim2.new(0, 10, 0, 10),
           Size = UDim2.new(1, -100, 0, 13),
-          Name = "ColorpickerTitle",
         }, Colorpicker)
 
         local ColorpickerContent = Custom:Create("TextLabel", {
@@ -2034,7 +2034,6 @@ function Speed_Library:CreateWindow(Config)
           BorderSizePixel = 0,
           Position = UDim2.new(0, 10, 0, 23),
           Size = UDim2.new(1, -100, 0, 12),
-          Name = "ColorpickerContent",
         }, Colorpicker)
 
         local function UpdateColorpickerSize()
@@ -2043,209 +2042,336 @@ function Speed_Library:CreateWindow(Config)
           Colorpicker.Size = UDim2.new(1, 0, 0, ColorpickerContent.AbsoluteSize.Y + 33)
           ColorpickerContent.TextWrapped = true
         end
-
         UpdateColorpickerSize()
         ColorpickerContent:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
           UpdateColorpickerSize()
           UpdateSizeSection()
         end)
 
-        -- Container Warna (Yang Diklik)
+        -- Kotak preview warna kecil
         local ColorBox = Custom:Create("Frame", {
           AnchorPoint = Vector2.new(1, 0.5),
           BackgroundColor3 = Default,
           BorderSizePixel = 0,
           Position = UDim2.new(1, -15, 0.5, 0),
           Size = UDim2.new(0, 30, 0, 20),
-          Name = "ColorBox",
         }, Colorpicker)
-
         Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, ColorBox)
         Custom:Create("UIStroke", {Color = Color3.fromRGB(255, 255, 255), Thickness = 1.5, Transparency = 0.8}, ColorBox)
 
+        -- Tombol invisible buat trigger dialog
         local ColorButton = Custom:Create("TextButton", {
-          Font = Enum.Font.SourceSans,
-          Text = "",
-          TextColor3 = Color3.fromRGB(0, 0, 0),
-          TextSize = 14,
-          BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-          BackgroundTransparency = 0.999,
-          BorderSizePixel = 0,
+          Font = Enum.Font.SourceSans, Text = "", TextColor3 = Color3.fromRGB(0, 0, 0), TextSize = 14,
+          BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0.999, BorderSizePixel = 0,
           Size = UDim2.new(1, 0, 1, 0),
-          Name = "ColorButton",
         }, Colorpicker)
 
-        -- Frame Popup Colorpicker (Tersembunyi)
-        local PickerPopup = Custom:Create("Frame", {
-          BackgroundColor3 = Color3.fromRGB(20, 20, 20),
-          BorderSizePixel = 0,
-          Visible = false,
-          ClipsDescendants = true,
-          Name = "PickerPopup",
-          Size = UDim2.new(0, 220, 0, 200),
-          ZIndex = 50,
-        }, Colorpicker)
 
-        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 6)}, PickerPopup)
-        Custom:Create("UIStroke", {Color = Color3.fromRGB(50, 50, 50), Thickness = 1.2}, PickerPopup)
+        -- ========== DIALOG POPUP (ScreenGui terpisah, di tengah layar) ==========
+        local DialogGui = Instance.new("ScreenGui")
+        DialogGui.Name = "CPDialog"
+        DialogGui.ResetOnSpawn = false
+        DialogGui.DisplayOrder = 100
+        DialogGui.Parent = Player.PlayerGui
+        DialogGui.Visible = false
 
-        -- Hue Slider (Vertikal di Kanan)
-        local HueFrame = Custom:Create("Frame", {
-          AnchorPoint = Vector2.new(1, 0),
-          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-          BackgroundTransparency = 0.999,
-          BorderSizePixel = 0,
-          Position = UDim2.new(1, -12, 0, 10),
-          Size = UDim2.new(0, 16, 0, 180),
-          Name = "HueFrame",
-          ZIndex = 51,
-        }, PickerPopup)
+        -- Overlay gelap fullscreen
+        local Overlay = Custom:Create("Frame", {
+          BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+          BackgroundTransparency = 0.6,
+          Size = UDim2.new(1, 0, 1, 0),
+          ZIndex = 10,
+        }, DialogGui)
 
-        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 8)}, HueFrame)
-        
-        local HueGradient = Custom:Create("UIGradient", {
-          Rotation = 90,
-          Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-            ColorSequenceKeypoint.new(0.16, Color3.fromRGB(255, 255, 0)),
-            ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
-            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
-            ColorSequenceKeypoint.new(0.66, Color3.fromRGB(0, 0, 255)),
-            ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0)),
-          }),
-        }, HueFrame)
-
-        local HueCursor = Custom:Create("Frame", {
+        -- Shadow dialog
+        local Shadow = Custom:Create("ImageLabel", {
           AnchorPoint = Vector2.new(0.5, 0.5),
-          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-          BorderSizePixel = 0,
-          Position = UDim2.new(0.5, 0, 0, 0),
-          Size = UDim2.new(0, 18, 0, 6),
-          Name = "HueCursor",
-          ZIndex = 52,
-        }, HueFrame)
-        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 3)}, HueCursor)
-        Custom:Create("UIStroke", {Color = Color3.fromRGB(0,0,0), Thickness = 1}, HueCursor)
+          BackgroundTransparency = 1,
+          Position = UDim2.new(0.5, 3, 0.5, 5),
+          Size = UDim2.new(0, 320, 0, 360),
+          Image = "rbxassetid://6015897843",
+          ImageColor3 = Color3.fromRGB(0, 0, 0),
+          ImageTransparency = 0.35,
+          ScaleType = Enum.ScaleType.Slice,
+          SliceCenter = Rect.new(49, 49, 450, 450),
+          ZIndex = 19,
+        }, Overlay)
 
-        -- SV Box (Kiri)
+        -- Box dialog utama
+        local Dialog = Custom:Create("Frame", {
+          AnchorPoint = Vector2.new(0.5, 0.5),
+          BackgroundColor3 = Color3.fromRGB(18, 18, 18),
+          BorderSizePixel = 0,
+          Position = UDim2.new(0.5, 0, 0.5, 0),
+          Size = UDim2.new(0, 310, 0, 360),
+          ZIndex = 20,
+        }, Overlay)
+        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 12)}, Dialog)
+        Custom:Create("UIStroke", {Color = Color3.fromRGB(55, 55, 55), Thickness = 1.5}, Dialog)
+
+        -- Judul dialog
+        Custom:Create("TextLabel", {
+          Font = Enum.Font.GothamBold,
+          Text = Title,
+          TextColor3 = Color3.fromRGB(255, 255, 255),
+          TextSize = 15,
+          BackgroundTransparency = 1,
+          Size = UDim2.new(1, -24, 0, 26),
+          Position = UDim2.new(0, 14, 0, 12),
+          ZIndex = 21,
+        }, Dialog)
+
+        -- Garis pemisah tipis bawah judul
+        Custom:Create("Frame", {
+          BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+          BorderSizePixel = 0,
+          Size = UDim2.new(1, -28, 0, 1),
+          Position = UDim2.new(0, 14, 0, 42),
+          ZIndex = 21,
+        }, Dialog)
+
+
+        -- ========== SV BOX (Kiri — kotak besar pilih saturasi & value) ==========
         local SVBox = Custom:Create("ImageLabel", {
           Image = "rbxassetid://4155801252",
           BackgroundColor3 = Color3.fromHSV(0, 1, 1),
           BackgroundTransparency = 0,
           BorderSizePixel = 0,
-          Position = UDim2.new(0, 10, 0, 10),
-          Size = UDim2.new(0, 180, 0, 180),
-          Name = "SVBox",
-          ZIndex = 51,
-        }, PickerPopup)
-        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 6)}, SVBox)
+          Position = UDim2.new(0, 15, 0, 52),
+          Size = UDim2.new(0, 238, 0, 238),
+          ZIndex = 21,
+        }, Dialog)
+        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 8)}, SVBox)
 
+        -- Cursor SV (lingkaran putih yang bisa di-drag)
         local SVCursor = Custom:Create("Frame", {
           AnchorPoint = Vector2.new(0.5, 0.5),
           BackgroundColor3 = Default,
           BorderSizePixel = 0,
           Position = UDim2.new(0, 0, 0, 0),
-          Size = UDim2.new(0, 12, 0, 12),
-          Name = "SVCursor",
-          ZIndex = 52,
+          Size = UDim2.new(0, 16, 0, 16),
+          ZIndex = 25,
         }, SVBox)
         Custom:Create("UICorner", {CornerRadius = UDim.new(1, 0)}, SVCursor)
-        Custom:Create("UIStroke", {Color = Color3.fromRGB(255,255,255), Thickness = 2}, SVCursor)
+        Custom:Create("UIStroke", {Color = Color3.fromRGB(255, 255, 255), Thickness = 3}, SVCursor)
 
-        -- Logika Warna
+
+        -- ========== HUE SLIDER (Kanan — bar vertikal pelangi) ==========
+        local HueSlider = Custom:Create("Frame", {
+          BackgroundTransparency = 1,
+          BorderSizePixel = 0,
+          Position = UDim2.new(0, 265, 0, 52),
+          Size = UDim2.new(0, 26, 0, 238),
+          ZIndex = 21,
+        }, Dialog)
+
+        -- Background pelangi (Frame terpisah biar BackgroundTransparency = 0, pasti kelihatan)
+        local HueBg = Custom:Create("Frame", {
+          Size = UDim2.new(1, 0, 1, 0),
+          BorderSizePixel = 0,
+          ZIndex = 21,
+        }, HueSlider)
+        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 13)}, HueBg)
+        Custom:Create("UIGradient", {
+          Rotation = 90,
+          Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0,    Color3.fromRGB(255, 0, 0)),
+            ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+            ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+            ColorSequenceKeypoint.new(0.5,  Color3.fromRGB(0, 255, 255)),
+            ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+            ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+            ColorSequenceKeypoint.new(1,    Color3.fromRGB(255, 0, 0)),
+          }),
+        }, HueBg)
+
+        -- Cursor Hue (pill horizontal yang bisa di-drag atas-bawah)
+        local HueCursor = Custom:Create("Frame", {
+          AnchorPoint = Vector2.new(0.5, 0.5),
+          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+          BorderSizePixel = 0,
+          Position = UDim2.new(0.5, 0, 0, 0),
+          Size = UDim2.new(1, 6, 0, 10),
+          ZIndex = 25,
+        }, HueSlider)
+        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 5)}, HueCursor)
+        Custom:Create("UIStroke", {Color = Color3.fromRGB(0, 0, 0), Thickness = 1.5}, HueCursor)
+
+
+        -- ========== TOMBOL BAWAH ==========
+        local ButtonsFrame = Custom:Create("Frame", {
+          BackgroundTransparency = 1,
+          Size = UDim2.new(1, -30, 0, 38),
+          Position = UDim2.new(0, 15, 1, -50),
+          ZIndex = 21,
+        }, Dialog)
+
+        -- Tombol Cancel (abu-abu agak putih)
+        local CancelBtn = Custom:Create("TextButton", {
+          Font = Enum.Font.GothamBold,
+          Text = "Cancel",
+          TextColor3 = Color3.fromRGB(210, 210, 210),
+          TextSize = 13,
+          BackgroundColor3 = Color3.fromRGB(75, 75, 75),
+          BorderSizePixel = 0,
+          Size = UDim2.new(0.48, 0, 1, 0),
+          Position = UDim2.new(0, 0, 0, 0),
+          ZIndex = 22,
+        }, ButtonsFrame)
+        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 7)}, CancelBtn)
+        Custom:Create("UIStroke", {Color = Color3.fromRGB(100, 100, 100), Thickness = 1, Transparency = 0.5}, CancelBtn)
+
+        -- Tombol Apply (warna tema / merah)
+        local ApplyBtn = Custom:Create("TextButton", {
+          Font = Enum.Font.GothamBold,
+          Text = "Apply",
+          TextColor3 = Color3.fromRGB(255, 255, 255),
+          TextSize = 13,
+          BackgroundColor3 = Custom.ColorRGB,
+          BorderSizePixel = 0,
+          Size = UDim2.new(0.48, 0, 1, 0),
+          Position = UDim2.new(0.52, 0, 0, 0),
+          ZIndex = 22,
+        }, ButtonsFrame)
+        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 7)}, ApplyBtn)
+
+        -- Hover effect Cancel
+        CancelBtn.MouseEnter:Connect(function()
+          TweenService:Create(CancelBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(95, 95, 95)}):Play()
+        end)
+        CancelBtn.MouseLeave:Connect(function()
+          TweenService:Create(CancelBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(75, 75, 75)}):Play()
+        end)
+
+        -- Hover effect Apply
+        ApplyBtn.MouseEnter:Connect(function()
+          local c = Custom.ColorRGB
+          TweenService:Create(ApplyBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(
+            math.min(math.floor(c.R * 255) + 30, 255),
+            math.min(math.floor(c.G * 255) + 30, 255),
+            math.min(math.floor(c.B * 255) + 30, 255)
+          )}):Play()
+        end)
+        ApplyBtn.MouseLeave:Connect(function()
+          TweenService:Create(ApplyBtn, TweenInfo.new(0.15), {BackgroundColor3 = Custom.ColorRGB}):Play()
+        end)
+
+
+        -- ========== LOGIKA WARNA ==========
         local H, S, V = Color3.toHSV(Default)
+        local TempH, TempS, TempV = H, S, V
         local DraggingSV = false
         local DraggingHue = false
 
         local function UpdateVisuals()
-            local Color = Color3.fromHSV(H, S, V)
-            SVBox.BackgroundColor3 = Color3.fromHSV(H, 1, 1)
-            SVCursor.Position = UDim2.new(S, 0, 1 - V, 0)
-            SVCursor.BackgroundColor3 = Color
-            HueCursor.Position = UDim2.new(0.5, 0, H, 0)
-            ColorBox.BackgroundColor3 = Color
-            Funcs_Colorpicker.Value = Color
+          local Color = Color3.fromHSV(TempH, TempS, TempV)
+          SVBox.BackgroundColor3 = Color3.fromHSV(TempH, 1, 1)
+          SVCursor.Position = UDim2.new(math.clamp(TempS, 0, 1), 0, 1 - math.clamp(TempV, 0, 1), 0)
+          SVCursor.BackgroundColor3 = Color
+          HueCursor.Position = UDim2.new(0.5, 0, math.clamp(TempH, 0, 1), 0)
+          HueCursor.BackgroundColor3 = Color3.fromHSV(TempH, 1, 1)
         end
 
-        UpdateVisuals()
+        local function OpenDialog()
+          TempH, TempS, TempV = H, S, V
+          UpdateVisuals()
+          DialogGui.Visible = true
+          Overlay.BackgroundTransparency = 1
+          Dialog.Size = UDim2.new(0, 310, 0, 0)
+          Dialog.BackgroundTransparency = 1
+          Shadow.ImageTransparency = 1
+          TweenService:Create(Overlay, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0.6}):Play()
+          TweenService:Create(Shadow, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {ImageTransparency = 0.35}):Play()
+          TweenService:Create(Dialog, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 310, 0, 360), BackgroundTransparency = 0}):Play()
+        end
 
-        -- Fungsi Dragging SV
+        local function CloseDialog()
+          TweenService:Create(Overlay, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
+          TweenService:Create(Shadow, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {ImageTransparency = 1}):Play()
+          local out = TweenService:Create(Dialog, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 310, 0, 0), BackgroundTransparency = 1})
+          out:Play()
+          out.Completed:Connect(function()
+            DialogGui.Visible = false
+          end)
+        end
+
+        -- Drag SV Box
         SVBox.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                DraggingSV = true
-            end
-        end)
-
-        -- Fungsi Dragging Hue
-        HueFrame.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                DraggingHue = true
-            end
-        end)
-
-        UserInputService.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-                if DraggingSV then
-                    local relX = math.clamp((input.Position.X - SVBox.AbsolutePosition.X) / SVBox.AbsoluteSize.X, 0, 1)
-                    local relY = math.clamp((input.Position.Y - SVBox.AbsolutePosition.Y) / SVBox.AbsoluteSize.Y, 0, 1)
-                    S = relX
-                    V = 1 - relY
-                    UpdateVisuals()
-                elseif DraggingHue then
-                    local relY = math.clamp((input.Position.Y - HueFrame.AbsolutePosition.Y) / HueFrame.AbsoluteSize.Y, 0, 1)
-                    H = relY
-                    UpdateVisuals()
-                end
-            end
-        end)
-
-        UserInputService.InputEnded:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                if DraggingSV or DraggingHue then
-                    DraggingSV = false
-                    DraggingHue = false
-                    Callback(Funcs_Colorpicker.Value)
-                end
-            end
-        end)
-
-        -- Toggle Buka/Tutup
-        local IsOpen = false
-        ColorButton.Activated:Connect(function()
-            CircleClick(ColorButton, Player:GetMouse().X, Player:GetMouse().Y)
-            IsOpen = not IsOpen
-            
-            if IsOpen then
-                PickerPopup.Visible = true
-                PickerPopup.Size = UDim2.new(0, 220, 0, 0)
-                TweenService:Create(PickerPopup, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                    Size = UDim2.new(0, 220, 0, 200)
-                }):Play()
-                -- Update ukuran section agar bisa menampung popup
-                local TargetSize = PickerPopup.Size.Y.Offset + 40
-                TweenService:Create(Colorpicker, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                    Size = UDim2.new(1, 0, 0, TargetSize)
-                }):Play()
-                task.wait(0.25)
-                UpdateSizeSection()
-            else
-                TweenService:Create(PickerPopup, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                    Size = UDim2.new(0, 220, 0, 0)
-                }):Play()
-                TweenService:Create(Colorpicker, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                    Size = UDim2.new(1, 0, 0, 35) -- Kembali ke ukuran semula
-                }):Play()
-                task.wait(0.2)
-                PickerPopup.Visible = false
-                UpdateSizeSection()
-            end
-        end)
-
-        function Funcs_Colorpicker:Set(Color)
-            H, S, V = Color3.toHSV(Color)
+          if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            DraggingSV = true
+            TempS = math.clamp((input.Position.X - SVBox.AbsolutePosition.X) / SVBox.AbsoluteSize.X, 0, 1)
+            TempV = 1 - math.clamp((input.Position.Y - SVBox.AbsolutePosition.Y) / SVBox.AbsoluteSize.Y, 0, 1)
             UpdateVisuals()
-            Callback(Color)
+          end
+        end)
+
+        -- Drag Hue Slider
+        HueSlider.InputBegan:Connect(function(input)
+          if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            DraggingHue = true
+            TempH = math.clamp((input.Position.Y - HueSlider.AbsolutePosition.Y) / HueSlider.AbsoluteSize.Y, 0, 1)
+            UpdateVisuals()
+          end
+        end)
+
+        -- Gerak mouse / touch
+        UserInputService.InputChanged:Connect(function(input)
+          if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            if DraggingSV then
+              TempS = math.clamp((input.Position.X - SVBox.AbsolutePosition.X) / SVBox.AbsoluteSize.X, 0, 1)
+              TempV = 1 - math.clamp((input.Position.Y - SVBox.AbsolutePosition.Y) / SVBox.AbsoluteSize.Y, 0, 1)
+              UpdateVisuals()
+            elseif DraggingHue then
+              TempH = math.clamp((input.Position.Y - HueSlider.AbsolutePosition.Y) / HueSlider.AbsoluteSize.Y, 0, 1)
+              UpdateVisuals()
+            end
+          end
+        end)
+
+        -- Lepas klik
+        UserInputService.InputEnded:Connect(function(input)
+          if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            DraggingSV = false
+            DraggingHue = false
+          end
+        end)
+
+        -- Klik element buka dialog
+        ColorButton.Activated:Connect(function()
+          CircleClick(ColorButton, Player:GetMouse().X, Player:GetMouse().Y)
+          OpenDialog()
+        end)
+
+        -- Cancel = tutup tanpa save
+        CancelBtn.Activated:Connect(function()
+          CircleClick(CancelBtn, Player:GetMouse().X, Player:GetMouse().Y)
+          CloseDialog()
+        end)
+
+        -- Apply = save warna lalu tutup
+        ApplyBtn.Activated:Connect(function()
+          CircleClick(ApplyBtn, Player:GetMouse().X, Player:GetMouse().Y)
+          H, S, V = TempH, TempS, TempV
+          local FinalColor = Color3.fromHSV(H, S, V)
+          Funcs_Colorpicker.Value = FinalColor
+          ColorBox.BackgroundColor3 = FinalColor
+          Callback(FinalColor)
+          CloseDialog()
+        end)
+
+        -- Klik overlay gelap = tutup
+        Overlay.InputBegan:Connect(function(input)
+          if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            CloseDialog()
+          end
+        end)
+
+        -- Fungsi Set dari luar
+        function Funcs_Colorpicker:Set(Color)
+          H, S, V = Color3.toHSV(Color)
+          Funcs_Colorpicker.Value = Color
+          ColorBox.BackgroundColor3 = Color
+          Callback(Color)
         end
 
         ItemCount += 1
