@@ -2082,6 +2082,10 @@ function Speed_Library:CreateWindow(Config)
   local CoreGui = game:GetService("CoreGui")
   local UserInputService = game:GetService("UserInputService")
 
+  -- Simpan warna sebelumnya untuk cancel
+  local previousColor = Default
+  local savedH, savedS, savedV = 0, 1, 1
+
   local function CreateColorPicker()
     if CoreGui:FindFirstChild("WindUIColorPickerCustom") then
       CoreGui.WindUIColorPickerCustom:Destroy()
@@ -2298,7 +2302,7 @@ function Speed_Library:CreateWindow(Config)
     ACorner.CornerRadius = UDim.new(0, 8)
     ACorner.Parent = ApplyBtn
 
-    local currentH, currentS, currentV = 0, 1, 1
+    local currentH, currentS, currentV = savedH, savedS, savedV
     local dragHue, dragCanvas = false, false
 
     local function updateColorOutputs()
@@ -2306,7 +2310,6 @@ function Speed_Library:CreateWindow(Config)
 
       ColorCanvas.BackgroundColor3 = Color3.fromHSV(currentH, 1, 1)
       BottomPreview.BackgroundColor3 = finalColor
-      ColorPreview.BackgroundColor3 = finalColor
 
       local r255 = math.floor(finalColor.R * 255)
       local g255 = math.floor(finalColor.G * 255)
@@ -2317,6 +2320,16 @@ function Speed_Library:CreateWindow(Config)
       BBox.Text = tostring(b255)
       HexBox.Text = "#" .. finalColor:ToHex()
     end
+
+    -- Set initial color dari saved
+    local h, s, v = Color3.toHSV(previousColor)
+    currentH, currentS, currentV = h, s, v
+    
+    -- Set pin positions berdasarkan HSV
+    HuePin.Position = UDim2.new(0, -2, 0, h * 120)
+    CanvasPin.Position = UDim2.new(0, s * 140 - 5, 0, (1 - v) * 120 - 5)
+    
+    updateColorOutputs()
 
     HueSlider.InputBegan:Connect(function(input)
       if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -2370,11 +2383,11 @@ function Speed_Library:CreateWindow(Config)
 
     ApplyBtn.MouseButton1Click:Connect(function()
       local finalColor = Color3.fromHSV(currentH, currentS, currentV)
+      savedH, savedS, savedV = currentH, currentS, currentV
+      previousColor = finalColor
       Funcs_Colorpicker:Set(finalColor)
       ScreenGui:Destroy()
     end)
-
-    updateColorOutputs()
   end
 
   ColorpickerButton.Activated:Connect(function()
