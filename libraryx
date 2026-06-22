@@ -1987,38 +1987,30 @@ function Speed_Library:CreateWindow(Config)
         return Funcs_Dropdown
       end
       
-      -- ==================== SPEED LIBRARY COLORPICKER ADDITION ====================
--- Tambahkan fungsi ini ke dalam Item object di dalam function Item:AddColorPicker(Config)
--- Letakkan sebelum: ItemCount += 1 di bagian akhir Item
-
-function Item:AddColorPicker(Config)
+      function Item:AddColorPicker(Config)
   local Title = Config[1] or Config.Title or ""
   local Content = Config[2] or Config.Content or ""
   local Default = Config[3] or Config.Default or Color3.fromRGB(255, 0, 0)
   local Callback = Config[4] or Config.Callback or function() end
   local Funcs_ColorPicker = {Value = Default}
 
-  -- Convert Color3 to HSV for internal manipulation
-  local function RGB2HSV(color)
+  local RGB2HSV = function(color)
     local h, s, v = Color3.toHSV(color)
     return {h = h, s = s, v = v}
   end
 
-  -- Convert HSV back to Color3
-  local function HSV2RGB(h, s, v)
+  local HSV2RGB = function(h, s, v)
     return Color3.fromHSV(h, s, v)
   end
 
-  -- Convert Color3 to Hex
-  local function Color3ToHex(color)
+  local Color3ToHex = function(color)
     return string.format("%06X", bit32.bor(
       bit32.lshift(math.floor(color.R * 255), 16),
       bit32.bor(bit32.lshift(math.floor(color.G * 255), 8), math.floor(color.B * 255))
     ))
   end
 
-  -- Convert Hex to Color3
-  local function HexToColor3(hex)
+  local HexToColor3 = function(hex)
     hex = hex:gsub("#", "")
     if #hex ~= 6 then return Default end
     local r = tonumber(hex:sub(1, 2), 16) / 255
@@ -2084,7 +2076,6 @@ function Item:AddColorPicker(Config)
     UpdateSizeSection()
   end)
 
-  -- Color Display Frame (kanan atas)
   local ColorDisplayFrame = Custom:Create("Frame", {
     AnchorPoint = Vector2.new(1, 0.5),
     BackgroundColor3 = Default,
@@ -2101,11 +2092,9 @@ function Item:AddColorPicker(Config)
     Transparency = 0.5
   }, ColorDisplayFrame)
 
-  -- Hidden Color Picker Dialog
   local PickerActive = false
   local CurrentHSV = RGB2HSV(Default)
 
-  -- Picker Dialog Frame
   local PickerDialog = Custom:Create("Frame", {
     BackgroundColor3 = Color3.fromRGB(20, 20, 20),
     BackgroundTransparency = 0.05,
@@ -2118,7 +2107,6 @@ function Item:AddColorPicker(Config)
 
   Custom:Create("UICorner", {}, PickerDialog)
 
-  -- Picker Window
   local PickerWindow = Custom:Create("Frame", {
     AnchorPoint = Vector2.new(0.5, 0.5),
     BackgroundColor3 = Color3.fromRGB(15, 15, 15),
@@ -2126,7 +2114,7 @@ function Item:AddColorPicker(Config)
     BorderColor3 = Color3.fromRGB(0, 0, 0),
     BorderSizePixel = 0,
     Position = UDim2.new(0.5, 0, 0.5, 0),
-    Size = UDim2.new(0, 350, 0, 300),
+    Size = UDim2.new(0, 300, 0, 320),
     Name = "PickerWindow",
     ZIndex = 1001
   }, PickerDialog)
@@ -2134,7 +2122,6 @@ function Item:AddColorPicker(Config)
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 8)}, PickerWindow)
   Custom:Create("UIStroke", {Color = Color3.fromRGB(50, 50, 50), Thickness = 1.6}, PickerWindow)
 
-  -- Title
   Custom:Create("TextLabel", {
     Font = Enum.Font.GothamBold,
     Text = "Color Picker",
@@ -2150,21 +2137,20 @@ function Item:AddColorPicker(Config)
     Parent = PickerWindow
   })
 
-  -- Saturation/Value Picker
   local SatVibFrame = Custom:Create("Frame", {
     BackgroundColor3 = HSV2RGB(CurrentHSV.h, 1, 1),
     BorderSizePixel = 0,
-    Size = UDim2.new(0, 200, 0, 150),
+    Size = UDim2.new(0, 170, 0, 140),
     Position = UDim2.new(0, 12, 0, 45),
     ClipsDescendants = true,
     ZIndex = 1002,
     Parent = PickerWindow,
-    Name = "SatVibFrame"
+    Name = "SatVibFrame",
+    Active = true
   })
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, SatVibFrame)
 
-  -- Saturation Gradient (White → Hue)
   local SatGradient = Custom:Create("Frame", {
     Size = UDim2.new(1, 0, 1, 0),
     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
@@ -2177,7 +2163,6 @@ function Item:AddColorPicker(Config)
     Rotation = 0
   }, SatGradient)
 
-  -- Value Gradient (Bright → Dark)
   local ValueGradient = Custom:Create("Frame", {
     Size = UDim2.new(1, 0, 1, 0),
     BackgroundColor3 = Color3.fromRGB(0, 0, 0),
@@ -2194,7 +2179,6 @@ function Item:AddColorPicker(Config)
     Rotation = 270
   }, ValueGradient)
 
-  -- Cursor untuk Saturation/Value
   local SatVibCursor = Custom:Create("Frame", {
     BackgroundColor3 = Custom.ColorRGB,
     BorderSizePixel = 0,
@@ -2207,21 +2191,20 @@ function Item:AddColorPicker(Config)
   Custom:Create("UICorner", {CornerRadius = UDim.new(1, 0)}, SatVibCursor)
   Custom:Create("UIStroke", {Color = Color3.fromRGB(255, 255, 255), Thickness = 1.5}, SatVibCursor)
 
-  -- Hue Slider
   local HueFrame = Custom:Create("Frame", {
     BackgroundColor3 = Color3.fromRGB(100, 100, 100),
     BorderSizePixel = 0,
-    Size = UDim2.new(0, 15, 0, 150),
-    Position = UDim2.new(0, 220, 0, 45),
+    Size = UDim2.new(0, 12, 0, 140),
+    Position = UDim2.new(0, 195, 0, 45),
     ClipsDescendants = true,
     ZIndex = 1002,
     Parent = PickerWindow,
-    Name = "HueFrame"
+    Name = "HueFrame",
+    Active = true
   })
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, HueFrame)
 
-  -- Hue Gradient
   local HueSequence = {}
   for i = 0, 1, 0.1 do
     table.insert(HueSequence, ColorSequenceKeypoint.new(i, HSV2RGB(i, 1, 1)))
@@ -2232,11 +2215,10 @@ function Item:AddColorPicker(Config)
     Rotation = 270
   }, HueFrame)
 
-  -- Cursor untuk Hue
   local HueCursor = Custom:Create("Frame", {
     BackgroundColor3 = Custom.ColorRGB,
     BorderSizePixel = 0,
-    Size = UDim2.new(0, 15, 0, 8),
+    Size = UDim2.new(0, 12, 0, 8),
     AnchorPoint = Vector2.new(0, 0.5),
     Position = UDim2.new(0, 0, CurrentHSV.h, 0),
     ZIndex = 1003,
@@ -2244,13 +2226,12 @@ function Item:AddColorPicker(Config)
   })
   Custom:Create("UIStroke", {Color = Color3.fromRGB(255, 255, 255), Thickness = 1.5}, HueCursor)
 
-  -- Hex Input
   local HexInputFrame = Custom:Create("Frame", {
     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
     BackgroundTransparency = 0.935,
     BorderSizePixel = 0,
     Size = UDim2.new(1, -24, 0, 30),
-    Position = UDim2.new(0, 12, 0, 210),
+    Position = UDim2.new(0, 12, 0, 200),
     ZIndex = 1002,
     Parent = PickerWindow
   })
@@ -2286,12 +2267,11 @@ function Item:AddColorPicker(Config)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 3)}, HexInput)
 
-  -- Buttons
   local ButtonsFrame = Custom:Create("Frame", {
     BackgroundTransparency = 0.999,
     BorderSizePixel = 0,
-    Size = UDim2.new(1, 0, 0, 30),
-    Position = UDim2.new(0, 0, 1, -30),
+    Size = UDim2.new(1, 0, 0, 35),
+    Position = UDim2.new(0, 0, 1, -35),
     ZIndex = 1002,
     Parent = PickerWindow
   })
@@ -2304,10 +2284,11 @@ function Item:AddColorPicker(Config)
     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
     BackgroundTransparency = 0.92,
     BorderSizePixel = 0,
-    Position = UDim2.new(0, 12, 0, 0),
-    Size = UDim2.new(0.5, -8, 1, 0),
+    Position = UDim2.new(0, 12, 0, 5),
+    Size = UDim2.new(0.5, -14, 0, 25),
     ZIndex = 1002,
-    Parent = ButtonsFrame
+    Parent = ButtonsFrame,
+    Active = true
   })
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, CancelButton)
@@ -2320,15 +2301,15 @@ function Item:AddColorPicker(Config)
     BackgroundColor3 = Custom.ColorRGB,
     BackgroundTransparency = 0.3,
     BorderSizePixel = 0,
-    Position = UDim2.new(0.5, 8, 0, 0),
-    Size = UDim2.new(0.5, -8, 1, 0),
+    Position = UDim2.new(0.5, 2, 0, 5),
+    Size = UDim2.new(0.5, -14, 0, 25),
     ZIndex = 1002,
-    Parent = ButtonsFrame
+    Parent = ButtonsFrame,
+    Active = true
   })
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, ApplyButton)
 
-  -- Functions
   local function UpdatePickerDisplay()
     SatVibFrame.BackgroundColor3 = HSV2RGB(CurrentHSV.h, 1, 1)
     SatVibCursor.Position = UDim2.new(CurrentHSV.s, 0, 1 - CurrentHSV.v, 0)
@@ -2339,16 +2320,33 @@ function Item:AddColorPicker(Config)
     ColorDisplayFrame.BackgroundColor3 = newColor
   end
 
-  -- Input handling untuk Sat/Vib
+  -- FIX MOBILE: Gunakan Mouse untuk positioning
   local draggingSatVib = false
+  local draggingHue = false
+  local Mouse = Player:GetMouse()
+
+  local function UpdateSatVibFromMouse()
+    local absPos = SatVibFrame.AbsolutePosition
+    local absSize = SatVibFrame.AbsoluteSize
+    local relX = (Mouse.X - absPos.X) / absSize.X
+    local relY = (Mouse.Y - absPos.Y) / absSize.Y
+    CurrentHSV.s = math.clamp(relX, 0, 1)
+    CurrentHSV.v = math.clamp(1 - relY, 0, 1)
+    UpdatePickerDisplay()
+  end
+
+  local function UpdateHueFromMouse()
+    local absPos = HueFrame.AbsolutePosition
+    local absSize = HueFrame.AbsoluteSize
+    local relY = (Mouse.Y - absPos.Y) / absSize.Y
+    CurrentHSV.h = math.clamp(relY, 0, 1)
+    UpdatePickerDisplay()
+  end
+
   SatVibFrame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
       draggingSatVib = true
-      local relX = (input.Position.X - SatVibFrame.AbsolutePosition.X) / SatVibFrame.AbsoluteSize.X
-      local relY = (input.Position.Y - SatVibFrame.AbsolutePosition.Y) / SatVibFrame.AbsoluteSize.Y
-      CurrentHSV.s = math.clamp(relX, 0, 1)
-      CurrentHSV.v = math.clamp(1 - relY, 0, 1)
-      UpdatePickerDisplay()
+      UpdateSatVibFromMouse()
     end
   end)
 
@@ -2358,24 +2356,10 @@ function Item:AddColorPicker(Config)
     end
   end)
 
-  UserInputService.InputChanged:Connect(function(input)
-    if draggingSatVib and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-      local relX = (input.Position.X - SatVibFrame.AbsolutePosition.X) / SatVibFrame.AbsoluteSize.X
-      local relY = (input.Position.Y - SatVibFrame.AbsolutePosition.Y) / SatVibFrame.AbsoluteSize.Y
-      CurrentHSV.s = math.clamp(relX, 0, 1)
-      CurrentHSV.v = math.clamp(1 - relY, 0, 1)
-      UpdatePickerDisplay()
-    end
-  end)
-
-  -- Input handling untuk Hue
-  local draggingHue = false
   HueFrame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
       draggingHue = true
-      local relY = (input.Position.Y - HueFrame.AbsolutePosition.Y) / HueFrame.AbsoluteSize.Y
-      CurrentHSV.h = math.clamp(relY, 0, 1)
-      UpdatePickerDisplay()
+      UpdateHueFromMouse()
     end
   end)
 
@@ -2386,14 +2370,14 @@ function Item:AddColorPicker(Config)
   end)
 
   UserInputService.InputChanged:Connect(function(input)
+    if draggingSatVib and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+      UpdateSatVibFromMouse()
+    end
     if draggingHue and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-      local relY = (input.Position.Y - HueFrame.AbsolutePosition.Y) / HueFrame.AbsoluteSize.Y
-      CurrentHSV.h = math.clamp(relY, 0, 1)
-      UpdatePickerDisplay()
+      UpdateHueFromMouse()
     end
   end)
 
-  -- Hex Input
   HexInput.FocusLost:Connect(function()
     local color = HexToColor3(HexInput.Text)
     if color then
@@ -2405,15 +2389,14 @@ function Item:AddColorPicker(Config)
     end
   end)
 
-  -- Buttons
   CancelButton.Activated:Connect(function()
-    CircleClick(CancelButton, Player:GetMouse().X, Player:GetMouse().Y)
+    CircleClick(CancelButton, Mouse.X, Mouse.Y)
     PickerDialog.Visible = false
     PickerActive = false
   end)
 
   ApplyButton.Activated:Connect(function()
-    CircleClick(ApplyButton, Player:GetMouse().X, Player:GetMouse().Y)
+    CircleClick(ApplyButton, Mouse.X, Mouse.Y)
     local finalColor = HSV2RGB(CurrentHSV.h, CurrentHSV.s, CurrentHSV.v)
     Funcs_ColorPicker.Value = finalColor
     Callback(finalColor)
@@ -2421,7 +2404,6 @@ function Item:AddColorPicker(Config)
     PickerActive = false
   end)
 
-  -- Open Color Picker
   local ColorPickerButton = Custom:Create("TextButton", {
     Font = Enum.Font.SourceSans,
     Text = "",
@@ -2432,7 +2414,8 @@ function Item:AddColorPicker(Config)
     BorderSizePixel = 0,
     Size = UDim2.new(1, 0, 1, 0),
     ZIndex = 1001,
-    Parent = ColorPicker
+    Parent = ColorPicker,
+    Active = true
   })
 
   ColorPickerButton.Activated:Connect(function()
@@ -2456,7 +2439,7 @@ function Item:AddColorPicker(Config)
 
   ItemCount += 1
   return Funcs_ColorPicker
-end 
+end
 
       ItemCount += 1
       return Item
