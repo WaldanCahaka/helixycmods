@@ -195,7 +195,7 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
     Frame.Size = UDim2.new(0, 260, 0, notifHeight)
     Frame.Position = UDim2.new(1, 20, 0, targetY)
     Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    Frame.BackgroundTransparency = 0.4 -- Transparan 60%
+    Frame.BackgroundTransparency = 0.4
     Frame.BorderSizePixel = 0
     Frame.Parent = ScreenGui
 
@@ -212,13 +212,13 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
     Stroke.Thickness = 1.5
     Stroke.Parent = Frame
 
-    -- Progress Overlay (Kiri, overlay merah transparan)
+    -- Progress Overlay (Full width, dari kiri ke kanan)
     if showProgress then
         local ProgressOverlay = Instance.new("Frame")
-        ProgressOverlay.Size = UDim2.new(0.5, 0, 1, 0) -- Mulai 50% lebar
+        ProgressOverlay.Size = UDim2.new(1, 0, 1, 0) -- FULL WIDTH
         ProgressOverlay.Position = UDim2.new(0, 0, 0, 0)
         ProgressOverlay.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
-        ProgressOverlay.BackgroundTransparency = 0.5 -- Transparan 50%
+        ProgressOverlay.BackgroundTransparency = 0.5
         ProgressOverlay.BorderSizePixel = 0
         ProgressOverlay.Parent = Frame
 
@@ -226,12 +226,13 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
         ProgressCorner.CornerRadius = UDim.new(0, 8)
         ProgressCorner.Parent = ProgressOverlay
 
-        -- Animate progress overlay shrink
-        TweenService:Create(
+        -- Animate progress overlay shrink dari kanan
+        local progressTween = TweenService:Create(
             ProgressOverlay,
             TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
             {Size = UDim2.new(0, 0, 1, 0)}
-        ):Play()
+        )
+        progressTween:Play()
     end
 
     -- Title
@@ -244,7 +245,7 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.TextXAlignment = Enum.TextXAlignment.Left
     Title.Text = title
-    Title.ZIndex = 2 -- Di atas progress overlay
+    Title.ZIndex = 2
     Title.Parent = Frame
 
     -- Description
@@ -259,7 +260,7 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
     Desc.TextXAlignment = Enum.TextXAlignment.Left
     Desc.TextYAlignment = Enum.TextYAlignment.Top
     Desc.Text = description
-    Desc.ZIndex = 2 -- Di atas progress overlay
+    Desc.ZIndex = 2
     Desc.Parent = Frame
 
     -- Animate in
