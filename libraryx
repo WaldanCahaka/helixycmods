@@ -155,7 +155,7 @@ end
 local Speed_Library = {}
 Speed_Library.Unloaded = false
 
--- ==================== WIND UI NOTIFICATION SYSTEM ====================
+-- ==================== WIND UI NOTIFICATION SYSTEM WITH PROGRESS ====================
 local ActiveNotifications = {}
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -174,8 +174,10 @@ local function RepositionNotifications()
     end
 end
 
-function Speed_Library:ShowNotification(title, description, duration)
+function Speed_Library:ShowNotification(title, description, duration, showProgress)
     duration = duration or 5
+    showProgress = showProgress ~= false -- Default true
+    
     local ScreenGui = Player.PlayerGui:FindFirstChild("WindNotifications")
     if not ScreenGui then
         ScreenGui = Instance.new("ScreenGui")
@@ -189,24 +191,25 @@ function Speed_Library:ShowNotification(title, description, duration)
     local index = #ActiveNotifications + 1
     local targetY = 15 + ((index - 1) * (notifHeight + spacing))
 
+    -- Main Frame
     local Frame = Instance.new("Frame")
     Frame.Size = UDim2.new(0, 260, 0, notifHeight)
     Frame.Position = UDim2.new(1, 20, 0, targetY)
     Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    Frame.BackgroundTransparency = 0
+    Frame.BackgroundTransparency = 0.4 -- Transparan 60%
     Frame.BorderSizePixel = 0
     Frame.Parent = ScreenGui
 
     table.insert(ActiveNotifications, Frame)
 
-    -- Wind UI Style Corner
+    -- Corner
     local Corner = Instance.new("UICorner")
     Corner.CornerRadius = UDim.new(0, 8)
     Corner.Parent = Frame
 
-    -- Red Border (Wind UI Style)
+    -- Red Border
     local Stroke = Instance.new("UIStroke")
-    Stroke.Color = Color3.fromRGB(239, 68, 68) -- Red
+    Stroke.Color = Color3.fromRGB(239, 68, 68)
     Stroke.Thickness = 1.5
     Stroke.Parent = Frame
 
@@ -236,6 +239,39 @@ function Speed_Library:ShowNotification(title, description, duration)
     Desc.Text = description
     Desc.Parent = Frame
 
+    -- Progress Bar (Optional)
+    if showProgress then
+        local ProgressContainer = Instance.new("Frame")
+        ProgressContainer.Size = UDim2.new(1, 0, 0, 4)
+        ProgressContainer.Position = UDim2.new(0, 0, 1, -4)
+        ProgressContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        ProgressContainer.BackgroundTransparency = 0.2
+        ProgressContainer.BorderSizePixel = 0
+        ProgressContainer.Parent = Frame
+
+        local ProgressCorner = Instance.new("UICorner")
+        ProgressCorner.CornerRadius = UDim.new(0, 8)
+        ProgressCorner.Parent = ProgressContainer
+
+        local ProgressBar = Instance.new("Frame")
+        ProgressBar.Size = UDim2.new(1, 0, 1, 0)
+        ProgressBar.Position = UDim2.new(0, 0, 0, 0)
+        ProgressBar.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
+        ProgressBar.BorderSizePixel = 0
+        ProgressBar.Parent = ProgressContainer
+
+        local ProgressCorner2 = Instance.new("UICorner")
+        ProgressCorner2.CornerRadius = UDim.new(0, 8)
+        ProgressCorner2.Parent = ProgressBar
+
+        -- Animate progress bar
+        TweenService:Create(
+            ProgressBar,
+            TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
+            {Size = UDim2.new(0, 0, 1, 0)}
+        ):Play()
+    end
+
     -- Animate in
     TweenService:Create(
         Frame,
@@ -243,6 +279,7 @@ function Speed_Library:ShowNotification(title, description, duration)
         {Position = UDim2.new(1, -280, 0, targetY)}
     ):Play()
 
+    -- Auto disappear
     task.delay(duration, function()
         if Frame and Frame.Parent then
             local SlideOut = TweenService:Create(
@@ -272,8 +309,9 @@ function Speed_Library:SetNotification(Config)
     local Title = Config.Title or Config[1] or "Notifikasi"
     local Description = Config.Description or Config.Content or Config[2] or "Tidak ada deskripsi"
     local Duration = Config.Duration or Config[5] or 3.5
+    local ShowProgress = Config.Progress ~= false -- Default true
 
-    self:ShowNotification(Title, Description, Duration)
+    self:ShowNotification(Title, Description, Duration, ShowProgress)
 end
 
 function Speed_Library:Notify(Config)
