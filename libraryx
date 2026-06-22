@@ -1987,54 +1987,42 @@ function Speed_Library:CreateWindow(Config)
         return Funcs_Dropdown
       end
       
-      function Item:AddColorPicker(Config)
-  local Title = Config[1] or Config.Title or "Colorpicker"
+      function Item:AddColorpicker(Config)
+  local Title = Config[1] or Config.Title or ""
   local Content = Config[2] or Config.Content or ""
-  local Default = Config[3] or Config.Default or Color3.fromRGB(255, 255, 255)
+  local Default = Config[3] or Config.Default or Color3.fromRGB(255, 0, 0)
   local Callback = Config[4] or Config.Callback or function() end
-  local Funcs_ColorPicker = {Value = Default}
+  local Funcs_Colorpicker = {Value = Default}
 
-  local IsExpanded = false
-
-  -- Main Container Colorpicker
-  local ColorPicker = Custom:Create("Frame", {
-    Name = "ColorPicker",
+  local Colorpicker = Custom:Create("Frame", {
     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
     BackgroundTransparency = 0.935,
+    BorderColor3 = Color3.fromRGB(0, 0, 0),
     BorderSizePixel = 0,
-    ClipsDescendants = true,
     LayoutOrder = ItemCount,
-    Size = UDim2.new(1, 0, 0, 35)
+    Size = UDim2.new(1, 0, 0, 35),
+    Name = "Colorpicker",
   }, SectionAdd)
 
-  Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, ColorPicker)
+  Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, Colorpicker)
 
-  -- Tombol Aktivasi Ekspansi Panel
-  local ColorPickerButton = Custom:Create("TextButton", {
-    Name = "ColorPickerButton",
-    Font = Enum.Font.SourceSans,
-    Text = "",
-    BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-    BackgroundTransparency = 0.999,
-    BorderSizePixel = 0,
-    Size = UDim2.new(1, 0, 0, 35)
-  }, ColorPicker)
-
-  local ColorPickerTitle = Custom:Create("TextLabel", {
-    Name = "ColorPickerTitle",
+  local ColorpickerTitle = Custom:Create("TextLabel", {
     Font = Enum.Font.GothamBold,
     Text = Title,
-    TextColor3 = Color3.fromRGB(231, 231, 231),
+    TextColor3 = Color3.fromRGB(230, 230, 230),
     TextSize = 13,
     TextXAlignment = Enum.TextXAlignment.Left,
     TextYAlignment = Enum.TextYAlignment.Top,
+    BackgroundColor3 = Color3.fromRGB(255, 255, 255),
     BackgroundTransparency = 0.999,
+    BorderColor3 = Color3.fromRGB(0, 0, 0),
+    BorderSizePixel = 0,
     Position = UDim2.new(0, 10, 0, 10),
-    Size = UDim2.new(1, -100, 0, 13)
-  }, ColorPicker)
+    Size = UDim2.new(1, -100, 0, 13),
+    Name = "ColorpickerTitle",
+  }, Colorpicker)
 
-  local ColorPickerContent = Custom:Create("TextLabel", {
-    Name = "ColorPickerContent",
+  local ColorpickerContent = Custom:Create("TextLabel", {
     Font = Enum.Font.GothamBold,
     Text = Content,
     TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -2042,198 +2030,368 @@ function Speed_Library:CreateWindow(Config)
     TextTransparency = 0.6,
     TextXAlignment = Enum.TextXAlignment.Left,
     TextYAlignment = Enum.TextYAlignment.Bottom,
+    BackgroundColor3 = Color3.fromRGB(255, 255, 255),
     BackgroundTransparency = 0.999,
+    BorderColor3 = Color3.fromRGB(0, 0, 0),
+    BorderSizePixel = 0,
     Position = UDim2.new(0, 10, 0, 23),
-    Size = UDim2.new(1, -100, 0, 12)
-  }, ColorPicker)
+    Size = UDim2.new(1, -100, 0, 12),
+    Name = "ColorpickerContent",
+  }, Colorpicker)
 
-  -- Indikator Kotak Warna (Preview)
-  local ColorIndicator = Custom:Create("Frame", {
-    Name = "ColorIndicator",
+  local function UpdateColorpickerSize()
+    ColorpickerContent.TextWrapped = false
+    local Ratio = ColorpickerContent.TextBounds.X / ColorpickerContent.AbsoluteSize.X
+    ColorpickerContent.Size = UDim2.new(1, -100, 0, 12 + (12 * math.ceil(Ratio)))
+    Colorpicker.Size = UDim2.new(1, 0, 0, ColorpickerContent.AbsoluteSize.Y + 33)
+    ColorpickerContent.TextWrapped = true
+  end
+
+  UpdateColorpickerSize()
+  ColorpickerContent:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+    UpdateColorpickerSize()
+    UpdateSizeSection()
+  end)
+
+  local ColorPreview = Custom:Create("Frame", {
     AnchorPoint = Vector2.new(1, 0.5),
     BackgroundColor3 = Default,
-    Position = UDim2.new(1, -15, 0, 17.5),
-    Size = UDim2.new(0, 20, 0, 20)
-  }, ColorPicker)
-  Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, ColorIndicator)
-  Custom:Create("UIStroke", {Color = Color3.fromRGB(255, 255, 255), Thickness = 1, Transparency = 0.5}, ColorIndicator)
+    BorderColor3 = Color3.fromRGB(0, 0, 0),
+    BorderSizePixel = 0,
+    Position = UDim2.new(1, -15, 0.5, 0),
+    Size = UDim2.new(0, 30, 0, 30),
+    Name = "ColorPreview",
+  }, Colorpicker)
 
-  -- Container Kontrol Slider R, G, B
-  local ControlsContainer = Custom:Create("Frame", {
-    Name = "ControlsContainer",
-    Position = UDim2.new(0, 10, 0, 40),
-    Size = UDim2.new(1, -20, 0, 85),
-    BackgroundTransparency = 1,
-    ClipsDescendants = true
-  }, ColorPicker)
+  Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, ColorPreview)
+  Custom:Create("UIStroke", {Color = Color3.fromRGB(255, 255, 255), Thickness = 2, Transparency = 0.8}, ColorPreview)
 
-  Custom:Create("UIListLayout", {Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder}, ControlsContainer)
+  local ColorpickerButton = Custom:Create("TextButton", {
+    Font = Enum.Font.SourceSans,
+    Text = "",
+    TextColor3 = Color3.fromRGB(0, 0, 0),
+    TextSize = 14,
+    BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+    BackgroundTransparency = 0.999,
+    BorderColor3 = Color3.fromRGB(0, 0, 0),
+    BorderSizePixel = 0,
+    Size = UDim2.new(1, 0, 1, 0),
+    Name = "ColorpickerButton",
+  }, Colorpicker)
 
-  -- Fungsi Pembuat Sub-Slider Internal (R/G/B)
-  local function CreateSubSlider(Name, MaxValue, StartValue, Order, UpdateCallback)
-    local SubSliderFrame = Custom:Create("Frame", {
-      Name = Name .. "Slider",
-      Size = UDim2.new(1, 0, 0, 24),
-      BackgroundTransparency = 1,
-      LayoutOrder = Order
-    }, ControlsContainer)
+  local CoreGui = game:GetService("CoreGui")
+  local UserInputService = game:GetService("UserInputService")
 
-    Custom:Create("TextLabel", {
-      Font = Enum.Font.GothamBold,
-      Text = Name,
-      TextColor3 = Color3.fromRGB(200, 200, 200),
-      TextSize = 12,
-      Size = UDim2.new(0, 15, 1, 0),
-      TextXAlignment = Enum.TextXAlignment.Left,
-      BackgroundTransparency = 1
-    }, SubSliderFrame)
-
-    local SliderBar = Custom:Create("Frame", {
-      AnchorPoint = Vector2.new(0, 0.5),
-      BackgroundColor3 = Color3.fromRGB(40, 40, 40),
-      Position = UDim2.new(0, 25, 0.5, 0),
-      Size = UDim2.new(1, -75, 0, 4),
-      Name = "SliderBar"
-    }, SubSliderFrame)
-    Custom:Create("UICorner", {}, SliderBar)
-
-    local SliderFill = Custom:Create("Frame", {
-      Size = UDim2.new(StartValue / MaxValue, 0, 1, 0),
-      BackgroundColor3 = Custom.ColorRGB,
-      BorderSizePixel = 0,
-      Name = "SliderFill"
-    }, SliderBar)
-    Custom:Create("UICorner", {}, SliderFill)
-
-    local SliderBtn = Custom:Create("Frame", {
-      AnchorPoint = Vector2.new(0.5, 0.5),
-      Position = UDim2.new(1, 0, 0.5, 0),
-      Size = UDim2.new(0, 8, 0, 8),
-      BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-      Name = "SliderBtn"
-    }, SliderFill)
-    Custom:Create("UICorner", {}, SliderBtn)
-
-    local ValTextBox = Custom:Create("TextBox", {
-      AnchorPoint = Vector2.new(1, 0.5),
-      Position = UDim2.new(1, 0, 0.5, 0),
-      Size = UDim2.new(0, 40, 0, 18),
-      BackgroundColor3 = Color3.fromRGB(25, 25, 25),
-      Font = Enum.Font.GothamBold,
-      Text = tostring(math.round(StartValue)),
-      TextColor3 = Color3.fromRGB(255, 255, 255),
-      TextSize = 11,
-      ClearTextOnFocus = false
-    }, SubSliderFrame)
-    Custom:Create("UICorner", {CornerRadius = UDim.new(0, 3)}, ValTextBox)
-    Custom:Create("UIStroke", {Color = Color3.fromRGB(50, 50, 50), Thickness = 1}, ValTextBox)
-
-    local Dragging = false
-
-    local function SetVal(val)
-      val = math.clamp(math.round(val), 0, MaxValue)
-      ValTextBox.Text = tostring(val)
-      SliderFill.Size = UDim2.new(val / MaxValue, 0, 1, 0)
-      UpdateCallback(val)
+  local function CreateColorPicker()
+    if CoreGui:FindFirstChild("WindUIColorPickerCustom") then
+      CoreGui.WindUIColorPickerCustom:Destroy()
     end
 
-    SliderBar.InputBegan:Connect(function(input)
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "WindUIColorPickerCustom"
+    ScreenGui.Parent = CoreGui
+    ScreenGui.ResetOnSpawn = false
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 320, 0, 260)
+    MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Parent = ScreenGui
+
+    local MainStroke = Instance.new("UIStroke")
+    MainStroke.Thickness = 2
+    MainStroke.Color = Color3.fromRGB(255, 0, 0)
+    MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    MainStroke.Parent = MainFrame
+
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, 12)
+    MainCorner.Parent = MainFrame
+
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, -20, 0, 35)
+    Title.Position = UDim2.new(0, 15, 0, 0)
+    Title.BackgroundTransparency = 1
+    Title.Text = "Color Picker"
+    Title.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Title.TextSize = 14
+    Title.Font = Enum.Font.SourceSansBold
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = MainFrame
+
+    local ColorCanvas = Instance.new("Frame")
+    ColorCanvas.Size = UDim2.new(0, 140, 0, 120)
+    ColorCanvas.Position = UDim2.new(0, 15, 0, 40)
+    ColorCanvas.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    ColorCanvas.BorderSizePixel = 0
+    ColorCanvas.Parent = MainFrame
+
+    local CanvasCorner = Instance.new("UICorner")
+    CanvasCorner.CornerRadius = UDim.new(0, 8)
+    CanvasCorner.Parent = ColorCanvas
+
+    local SatGrad = Instance.new("Frame")
+    SatGrad.Size = UDim2.new(1, 0, 1, 0)
+    SatGrad.BackgroundTransparency = 0
+    SatGrad.BorderSizePixel = 0
+    SatGrad.Parent = ColorCanvas
+
+    local SatGradObj = Instance.new("UIGradient")
+    SatGradObj.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 255, 255))
+    SatGradObj.Transparency = NumberSequence.new(0, 1)
+    SatGradObj.Parent = SatGrad
+
+    local SatCorner = Instance.new("UICorner")
+    SatCorner.CornerRadius = UDim.new(0, 8)
+    SatCorner.Parent = SatGrad
+
+    local ValGrad = Instance.new("Frame")
+    ValGrad.Size = UDim2.new(1, 0, 1, 0)
+    ValGrad.BackgroundTransparency = 0
+    ValGrad.BorderSizePixel = 0
+    ValGrad.Parent = ColorCanvas
+
+    local ValGradObj = Instance.new("UIGradient")
+    ValGradObj.Color = ColorSequence.new(Color3.fromRGB(0, 0, 0), Color3.fromRGB(0, 0, 0))
+    ValGradObj.Transparency = NumberSequence.new(1, 0)
+    ValGradObj.Rotation = 90
+    ValGradObj.Parent = ValGrad
+
+    local ValCorner = Instance.new("UICorner")
+    ValCorner.CornerRadius = UDim.new(0, 8)
+    ValCorner.Parent = ValGrad
+
+    local CanvasPin = Instance.new("Frame")
+    CanvasPin.Size = UDim2.new(0, 10, 0, 10)
+    CanvasPin.Position = UDim2.new(1, -5, 0, -5)
+    CanvasPin.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    CanvasPin.Parent = ColorCanvas
+
+    local PinCorner = Instance.new("UICorner")
+    PinCorner.CornerRadius = UDim.new(1, 0)
+    PinCorner.Parent = CanvasPin
+
+    local PinStroke = Instance.new("UIStroke")
+    PinStroke.Color = Color3.fromRGB(0, 0, 0)
+    PinStroke.Thickness = 1.5
+    PinStroke.Parent = CanvasPin
+
+    local HueSlider = Instance.new("Frame")
+    HueSlider.Size = UDim2.new(0, 12, 0, 120)
+    HueSlider.Position = UDim2.new(0, 165, 0, 40)
+    HueSlider.BorderSizePixel = 0
+    HueSlider.Parent = MainFrame
+
+    local HueCorner = Instance.new("UICorner")
+    HueCorner.CornerRadius = UDim.new(0, 4)
+    HueCorner.Parent = HueSlider
+
+    local HueGrad = Instance.new("UIGradient")
+    HueGrad.Rotation = 90
+    HueGrad.Color = ColorSequence.new({
+      ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
+      ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+      ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+      ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)),
+      ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+      ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+      ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0))
+    })
+    HueGrad.Parent = HueSlider
+
+    local HuePin = Instance.new("Frame")
+    HuePin.Size = UDim2.new(1, 4, 0, 6)
+    HuePin.Position = UDim2.new(0, -2, 0, 0)
+    HuePin.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    HuePin.Parent = HueSlider
+
+    local HuePinCorner = Instance.new("UICorner")
+    HuePinCorner.CornerRadius = UDim.new(0, 2)
+    HuePinCorner.Parent = HuePin
+
+    local HueStroke = Instance.new("UIStroke")
+    HueStroke.Color = Color3.fromRGB(0, 0, 0)
+    HueStroke.Thickness = 1
+    HueStroke.Parent = HuePin
+
+    local function createInputBox(labelName, defaultText, posY)
+      local BoxFrame = Instance.new("Frame")
+      BoxFrame.Size = UDim2.new(0, 110, 0, 26)
+      BoxFrame.Position = UDim2.new(0, 195, 0, posY)
+      BoxFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+      BoxFrame.Parent = MainFrame
+
+      local BC = Instance.new("UICorner")
+      BC.CornerRadius = UDim.new(0, 6)
+      BC.Parent = BoxFrame
+
+      local TextLabel = Instance.new("TextLabel")
+      TextLabel.Size = UDim2.new(0, 40, 1, 0)
+      TextLabel.Position = UDim2.new(1, -45, 0, 0)
+      TextLabel.BackgroundTransparency = 1
+      TextLabel.Text = labelName
+      TextLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
+      TextLabel.TextSize = 12
+      TextLabel.Font = Enum.Font.SourceSans
+      TextLabel.TextXAlignment = Enum.TextXAlignment.Right
+      TextLabel.Parent = BoxFrame
+
+      local TextBox = Instance.new("TextBox")
+      TextBox.Size = UDim2.new(1, -50, 1, 0)
+      TextBox.Position = UDim2.new(0, 10, 0, 0)
+      TextBox.BackgroundTransparency = 1
+      TextBox.Text = defaultText
+      TextBox.TextColor3 = Color3.fromRGB(230, 230, 230)
+      TextBox.TextSize = 13
+      TextBox.Font = Enum.Font.SourceSans
+      TextBox.TextXAlignment = Enum.TextXAlignment.Left
+      TextBox.ClearTextOnFocus = false
+      TextBox.Parent = BoxFrame
+
+      return TextBox
+    end
+
+    local HexBox = createInputBox("Hex", "#ff0000", 40)
+    local RBox = createInputBox("Red", "255", 72)
+    local GBox = createInputBox("Green", "0", 104)
+    local BBox = createInputBox("Blue", "0", 136)
+
+    local BottomPreview = Instance.new("Frame")
+    BottomPreview.Size = UDim2.new(0, 140, 0, 24)
+    BottomPreview.Position = UDim2.new(0, 15, 0, 170)
+    BottomPreview.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    BottomPreview.BorderSizePixel = 0
+    BottomPreview.Parent = MainFrame
+
+    local BPCorner = Instance.new("UICorner")
+    BPCorner.CornerRadius = UDim.new(0, 6)
+    BPCorner.Parent = BottomPreview
+
+    local CancelBtn = Instance.new("TextButton")
+    CancelBtn.Size = UDim2.new(0, 140, 0, 32)
+    CancelBtn.Position = UDim2.new(0, 15, 0, 210)
+    CancelBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    CancelBtn.Text = "Cancel"
+    CancelBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CancelBtn.Font = Enum.Font.SourceSansBold
+    CancelBtn.TextSize = 14
+    CancelBtn.Parent = MainFrame
+
+    local CCorner = Instance.new("UICorner")
+    CCorner.CornerRadius = UDim.new(0, 8)
+    CCorner.Parent = CancelBtn
+
+    local ApplyBtn = Instance.new("TextButton")
+    ApplyBtn.Size = UDim2.new(0, 140, 0, 32)
+    ApplyBtn.Position = UDim2.new(0, 165, 0, 210)
+    ApplyBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+    ApplyBtn.Text = "Apply"
+    ApplyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ApplyBtn.Font = Enum.Font.SourceSansBold
+    ApplyBtn.TextSize = 14
+    ApplyBtn.Parent = MainFrame
+
+    local ACorner = Instance.new("UICorner")
+    ACorner.CornerRadius = UDim.new(0, 8)
+    ACorner.Parent = ApplyBtn
+
+    local currentH, currentS, currentV = 0, 1, 1
+    local dragHue, dragCanvas = false, false
+
+    local function updateColorOutputs()
+      local finalColor = Color3.fromHSV(currentH, currentS, currentV)
+
+      ColorCanvas.BackgroundColor3 = Color3.fromHSV(currentH, 1, 1)
+      BottomPreview.BackgroundColor3 = finalColor
+      ColorPreview.BackgroundColor3 = finalColor
+
+      local r255 = math.floor(finalColor.R * 255)
+      local g255 = math.floor(finalColor.G * 255)
+      local b255 = math.floor(finalColor.B * 255)
+
+      RBox.Text = tostring(r255)
+      GBox.Text = tostring(g255)
+      BBox.Text = tostring(b255)
+      HexBox.Text = "#" .. finalColor:ToHex()
+    end
+
+    HueSlider.InputBegan:Connect(function(input)
       if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        Dragging = true
+        dragHue = true
       end
     end)
 
-    UserInputService.InputChanged:Connect(function(input)
-      if Dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local relativeX = math.clamp((input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1)
-        SetVal(relativeX * MaxValue)
+    ColorCanvas.InputBegan:Connect(function(input)
+      if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragCanvas = true
       end
     end)
 
     UserInputService.InputEnded:Connect(function(input)
       if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        Dragging = false
+        dragHue = false
+        dragCanvas = false
       end
     end)
 
-    ValTextBox.FocusLost:Connect(function()
-      local num = tonumber(ValTextBox.Text) or StartValue
-      SetVal(num)
-    end)
+    UserInputService.InputChanged:Connect(function(input)
+      if dragHue and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local mousePos = UserInputService:GetMouseLocation()
+        local relativeY = mousePos.Y - HueSlider.AbsolutePosition.Y - 35
+        local percentage = math.clamp(relativeY / HueSlider.AbsoluteSize.Y, 0, 1)
 
-    return {
-      Update = function(val)
-        val = math.clamp(math.round(val), 0, MaxValue)
-        ValTextBox.Text = tostring(val)
-        SliderFill.Size = UDim2.new(val / MaxValue, 0, 1, 0)
+        HuePin.Position = UDim2.new(0, -2, 0, math.clamp(relativeY, 0, HueSlider.AbsoluteSize.Y - 6))
+
+        currentH = percentage
+        updateColorOutputs()
+
+      elseif dragCanvas and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local mousePos = UserInputService:GetMouseLocation()
+        local relativeX = mousePos.X - ColorCanvas.AbsolutePosition.X
+        local relativeY = mousePos.Y - ColorCanvas.AbsolutePosition.Y - 35
+
+        local pctX = math.clamp(relativeX / ColorCanvas.AbsoluteSize.X, 0, 1)
+        local pctY = math.clamp(relativeY / ColorCanvas.AbsoluteSize.Y, 0, 1)
+
+        CanvasPin.Position = UDim2.new(0, math.clamp(relativeX - 5, -5, ColorCanvas.AbsoluteSize.X - 5), 0, math.clamp(relativeY - 5, -5, ColorCanvas.AbsoluteSize.Y - 5))
+
+        currentS = pctX
+        currentV = 1 - pctY
+        updateColorOutputs()
       end
-    }
-  end
-
-  local currentR, currentG, currentB = Default.R * 255, Default.G * 255, Default.B * 255
-
-  local function UpdateColor()
-    local newColor = Color3.fromRGB(currentR, currentG, currentB)
-    Funcs_ColorPicker.Value = newColor
-    ColorIndicator.BackgroundColor3 = newColor
-    Callback(newColor)
-  end
-
-  local SliderR = CreateSubSlider("R", 255, currentR, 1, function(v) currentR = v UpdateColor() end)
-  local SliderG = CreateSubSlider("G", 255, currentG, 2, function(v) currentG = v UpdateColor() end)
-  local SliderB = CreateSubSlider("B", 255, currentB, 3, function(v) currentB = v UpdateColor() end)
-
-  -- Handler Ukuran Otomatis & Responsif
-  local function UpdateColorPickerSize()
-    ColorPickerContent.TextWrapped = false
-    local Ratio = ColorPickerContent.TextBounds.X / ColorPickerContent.AbsoluteSize.X
-    ColorPickerContent.Size = UDim2.new(1, -100, 0, 12 + (12 * math.ceil(Ratio)))
-    
-    if IsExpanded then
-      ColorPicker.Size = UDim2.new(1, 0, 0, ColorPickerContent.AbsoluteSize.Y + 38 + 85)
-    else
-      ColorPicker.Size = UDim2.new(1, 0, 0, ColorPickerContent.AbsoluteSize.Y + 33)
-    end
-    ColorPickerContent.TextWrapped = true
-  end
-
-  ColorPickerButton.Activated:Connect(function()
-    CircleClick(ColorPickerButton, Player:GetMouse().X, Player:GetMouse().Y)
-    IsExpanded = not IsExpanded
-    
-    local targetHeight = IsExpanded and (ColorPickerContent.AbsoluteSize.Y + 123) or (ColorPickerContent.AbsoluteSize.Y + 33)
-    local tween = TweenService:Create(ColorPicker, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
-      Size = UDim2.new(1, 0, 0, targetHeight)
-    })
-    tween:Play()
-    
-    tween.Completed:Connect(function()
-      UpdateSizeSection()
     end)
-    UpdateSizeSection()
-  end)
 
-  ColorPickerContent:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-    UpdateColorPickerSize()
-    UpdateSizeSection()
-  end)
-  UpdateColorPickerSize()
+    CancelBtn.MouseButton1Click:Connect(function()
+      ScreenGui:Destroy()
+    end)
 
-  -- Fungsi Eksternal API (.Set)
-  function Funcs_ColorPicker:Set(newColor)
-    Funcs_ColorPicker.Value = newColor
-    currentR, currentG, currentB = newColor.R * 255, newColor.G * 255, newColor.B * 255
-    ColorIndicator.BackgroundColor3 = newColor
-    SliderR.Update(currentR)
-    SliderG.Update(currentG)
-    SliderB.Update(currentB)
-    Callback(newColor)
+    ApplyBtn.MouseButton1Click:Connect(function()
+      local finalColor = Color3.fromHSV(currentH, currentS, currentV)
+      Funcs_Colorpicker:Set(finalColor)
+      ScreenGui:Destroy()
+    end)
+
+    updateColorOutputs()
   end
+
+  ColorpickerButton.Activated:Connect(function()
+    CreateColorPicker()
+  end)
+
+  function Funcs_Colorpicker:Set(Value)
+    Funcs_Colorpicker.Value = Value
+    ColorPreview.BackgroundColor3 = Value
+    Callback(Value)
+  end
+
+  Funcs_Colorpicker:Set(Default)
 
   ItemCount += 1
-  return Funcs_ColorPicker
+  return Funcs_Colorpicker
 end
-
 
       ItemCount += 1
       return Item
