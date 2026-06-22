@@ -2054,7 +2054,6 @@ function Speed_Library:CreateWindow(Config)
         UpdateSize()
         CPContent:GetPropertyChangedSignal("AbsoluteSize"):Connect(UpdateSize)
 
-        -- ==================== COLOR PICKER WINDOW ====================
         local function OpenColorPicker()
           local PickerGui = Custom:Create("ScreenGui", {Name = "SpeedColorPicker"..tick(), ResetOnSpawn = false}, 
             RunService:IsStudio() and Player.PlayerGui or game:GetService("CoreGui"))
@@ -2091,7 +2090,6 @@ function Speed_Library:CreateWindow(Config)
 
           CloseBtn.Activated:Connect(function() PickerGui:Destroy() end)
 
-          -- SatVib Map
           local SatVibMap = Custom:Create("ImageLabel", {
             Size = UDim2.fromOffset(200, 200),
             Position = UDim2.fromOffset(20, 55),
@@ -2110,7 +2108,6 @@ function Speed_Library:CreateWindow(Config)
           Custom:Create("UICorner", {CornerRadius = UDim.new(1,0)}, Cursor)
           Custom:Create("UIStroke", {Color = Color3.new(1,1,1), Thickness = 2.5}, Cursor)
 
-          -- Hue Slider
           local HueSlider = Custom:Create("Frame", {
             Size = UDim2.fromOffset(20, 200),
             Position = UDim2.fromOffset(235, 55),
@@ -2143,19 +2140,13 @@ function Speed_Library:CreateWindow(Config)
           end
           UpdateUI()
 
-          -- Dragging
           local draggingMap, draggingHue = false, false
 
           SatVibMap.InputBegan:Connect(function(i) 
-            if i.UserInputType == Enum.UserInputType.MouseButton1 then 
-              draggingMap = true 
-            end 
+            if i.UserInputType == Enum.UserInputType.MouseButton1 then draggingMap = true end 
           end)
-
           HueSlider.InputBegan:Connect(function(i) 
-            if i.UserInputType == Enum.UserInputType.MouseButton1 then 
-              draggingHue = true 
-            end 
+            if i.UserInputType == Enum.UserInputType.MouseButton1 then draggingHue = true end 
           end)
 
           UserInputService.InputChanged:Connect(function(input)
@@ -2181,7 +2172,6 @@ function Speed_Library:CreateWindow(Config)
             end
           end)
 
-          -- Apply Button
           local Apply = Custom:Create("TextButton", {
             Size = UDim2.new(0.88, 0, 0, 45),
             Position = UDim2.new(0.5, 0, 1, -60),
