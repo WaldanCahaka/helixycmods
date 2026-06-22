@@ -236,11 +236,37 @@ function Speed_Library:ShowNotification(title, description, duration)
     Desc.Text = description
     Desc.Parent = Frame
 
+    -- Progress Bar Highlight (Silau Red) - di atas
+    local Progress = Instance.new("Frame")
+    Progress.Size = UDim2.new(1, 0, 0, 4)
+    Progress.Position = UDim2.new(0, 0, 1, -4)
+    Progress.BackgroundColor3 = Color3.fromRGB(255, 100, 100) -- Red lebih silau
+    Progress.BorderSizePixel = 0
+    Progress.Parent = Frame
+
+    local ProgressCorner = Instance.new("UICorner")
+    ProgressCorner.CornerRadius = UDim.new(0, 8)
+    ProgressCorner.Parent = Progress
+
+    -- Glow effect (optional)
+    local Glow = Instance.new("UIStroke")
+    Glow.Color = Color3.fromRGB(255, 100, 100)
+    Glow.Thickness = 0.5
+    Glow.Transparency = 0.5
+    Glow.Parent = Progress
+
     -- Animate in
     TweenService:Create(
         Frame,
         TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
         {Position = UDim2.new(1, -280, 0, targetY)}
+    ):Play()
+
+    -- Progress bar animation (kanan ke kiri)
+    TweenService:Create(
+        Progress,
+        TweenInfo.new(duration, Enum.EasingStyle.Linear),
+        {Size = UDim2.new(0, 0, 0, 4)}
     ):Play()
 
     task.delay(duration, function()
