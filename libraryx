@@ -2406,6 +2406,119 @@ function Speed_Library:CreateWindow(Config)
   return Funcs_Colorpicker
 end
 
+function Speed_Library:CreateKeySystem(Config)
+  local KeySystemEnabled = Config.keysystem or Config[1] or true
+  local Title = Config.Title or Config[2] or "Key System"
+  local Content = Config.Content or Config[3] or "Enter your key"
+  local Password = Config.Password or Config[4] or "1234"
+  local ClipboardText = Config.ClipboardText or "https://your-link.com"
+
+  if not KeySystemEnabled then return end
+
+  local ScreenGui = Instance.new("ScreenGui")
+  ScreenGui.Name = "KeySystemGui"
+  ScreenGui.Parent = RunService:IsStudio() and Player.PlayerGui or (gethui() or cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui"))
+  ScreenGui.ResetOnSpawn = false
+
+  local Main = Custom:Create("Frame", {
+    Size = UDim2.new(0, 430, 0, 225),
+    Position = UDim2.new(0.5, -215, 0.5, -112),
+    BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+    BorderSizePixel = 0
+  }, ScreenGui)
+
+  Custom:Create("UICorner", {CornerRadius = UDim.new(0, 16)}, Main)
+  Custom:Create("UIStroke", {Color = Color3.fromRGB(255, 0, 0), Thickness = 3}, Main)
+
+  Custom:Create("TextLabel", {
+    Position = UDim2.new(0, 0, 0, 18),
+    Size = UDim2.new(1, 0, 0, 35),
+    BackgroundTransparency = 1,
+    Text = Title,
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    Font = Enum.Font.GothamBold,
+    TextSize = 28
+  }, Main)
+
+  Custom:Create("TextLabel", {
+    Position = UDim2.new(0, 0, 0, 52),
+    Size = UDim2.new(1, 0, 0, 20),
+    BackgroundTransparency = 1,
+    Text = Content,
+    TextColor3 = Color3.fromRGB(170, 170, 170),
+    Font = Enum.Font.Gotham,
+    TextSize = 15
+  }, Main)
+
+  local KeyBox = Custom:Create("TextBox", {
+    Position = UDim2.new(0.5, -160, 0, 92),
+    Size = UDim2.new(0, 320, 0, 47),
+    BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    PlaceholderText = "Enter Key",
+    PlaceholderColor3 = Color3.fromRGB(140, 140, 140),
+    Font = Enum.Font.Gotham,
+    TextSize = 17,
+    BorderSizePixel = 0,
+    ClearTextOnFocus = false,
+    TextXAlignment = Enum.TextXAlignment.Left
+  }, Main)
+
+  Custom:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, KeyBox)
+  Custom:Create("UIPadding", {PaddingLeft = UDim.new(0, 48)}, KeyBox)
+  Custom:Create("ImageLabel", {
+    Size = UDim2.new(0, 24, 0, 24),
+    Position = UDim2.new(0, 12, 0.5, -12),
+    BackgroundTransparency = 1,
+    Image = "rbxassetid://96510194465420",
+    ImageColor3 = Color3.fromRGB(180, 180, 180)
+  }, KeyBox)
+
+  local function CreateButton(text, iconId, xPos, bgColor, callback)
+    local btn = Custom:Create("TextButton", {
+      Position = UDim2.new(0, xPos, 1, -68),
+      Size = UDim2.new(0, 120, 0, 46),
+      BackgroundColor3 = bgColor,
+      BorderSizePixel = 0,
+      Text = text,
+      TextColor3 = Color3.fromRGB(255, 255, 255),
+      Font = Enum.Font.GothamBold,
+      TextSize = 15
+    }, Main)
+
+    Custom:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, btn)
+    Custom:Create("ImageLabel", {
+      Size = UDim2.new(0, 20, 0, 20),
+      Position = UDim2.new(0, 12, 0.5, -10),
+      BackgroundTransparency = 1,
+      Image = iconId,
+      ImageColor3 = Color3.fromRGB(255, 255, 255)
+    }, btn)
+
+    btn.MouseButton1Click:Connect(callback)
+    return btn
+  end
+
+  local ExitButton = CreateButton("Exit", "rbxassetid://84895399304975", 35, Color3.fromRGB(45, 45, 45), function()
+    ScreenGui:Destroy()
+  end)
+
+  local GetKeyButton = CreateButton("Get key", "rbxassetid://96510194465420", 160, Color3.fromRGB(40, 40, 45), function()
+    setclipboard(ClipboardText)
+    Speed_Library:Notify({Title = "Copied", Description = ClipboardText, Duration = 2})
+  end)
+
+  local SubmitButton = CreateButton("Submit", "rbxassetid://92473583511724", 285, Color3.fromRGB(100, 100, 125), function()
+    if KeyBox.Text == tostring(Password) then
+      ScreenGui:Destroy()
+      Speed_Library:Notify({Title = "Success", Description = "Key correct!", Duration = 3})
+    else
+      KeyBox.Text = ""
+      KeyBox.PlaceholderText = "Wrong Key!"
+    end
+  end)
+end
+
       ItemCount += 1
       return Item
     end
@@ -2417,4 +2530,4 @@ end
   return Tabs
 end
 
-return Speed_Library
+return Speed_Library 
