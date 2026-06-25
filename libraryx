@@ -324,7 +324,7 @@ function Speed_Library:Notify(Config)
     self:SetNotification(Config)
 end
 
-Function Speed_Library:CreateWindow(Config)
+function Speed_Library:CreateWindow(Config)
   local Title = Config[1] or Config.Title or ""
   local Description = Config[2] or Config.Description or ""
   local TabWidth = Config[3] or Config["Tab Width"] or 120
@@ -334,8 +334,6 @@ Function Speed_Library:CreateWindow(Config)
   local ValidKeys = KeySystem and KeySystem.Key or {}
   local KeyNote = KeySystem and KeySystem.Note or "Enter your key"
   local KeyURL = KeySystem and KeySystem.URL or ""
-  
-  local Funcs = {}
   
   if KeySystem then
     local KeyScreenGui = Custom:Create("ScreenGui", {
@@ -353,7 +351,6 @@ Function Speed_Library:CreateWindow(Config)
     Custom:Create("UICorner", {CornerRadius = UDim.new(0, 16)}, KeyMain)
     Custom:Create("UIStroke", {Color = Custom.ColorRGB or Color3.fromRGB(255, 0, 0), Thickness = 3}, KeyMain)
 
-    -- Title
     Custom:Create("TextLabel", {
       Position = UDim2.new(0, 0, 0, 18),
       Size = UDim2.new(1, 0, 0, 35),
@@ -364,7 +361,6 @@ Function Speed_Library:CreateWindow(Config)
       BackgroundTransparency = 1,
     }, KeyMain)
 
-    -- Note
     Custom:Create("TextLabel", {
       Position = UDim2.new(0, 0, 0, 52),
       Size = UDim2.new(1, 0, 0, 20),
@@ -375,39 +371,33 @@ Function Speed_Library:CreateWindow(Config)
       BackgroundTransparency = 1,
     }, KeyMain)
 
-    -- KeyBox yang diperbaiki
-local KeyBox = Custom:Create("TextBox", {
-    Position = UDim2.new(0.5, -160, 0, 92),
-    Size = UDim2.new(0, 320, 0, 47),
-    BackgroundColor3 = Color3.fromRGB(35, 35, 35),
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    PlaceholderText = "Enter Key", -- Ganti teks "TextBox" ke "Enter Key"
-    PlaceholderColor3 = Color3.fromRGB(140, 140, 140),
-    Font = Enum.Font.Gotham,
-    TextSize = 17,
-    BorderSizePixel = 0,
-    ClearTextOnFocus = false,
-    TextXAlignment = Enum.TextXAlignment.Left,
-}, KeyMain)
+    -- KeyBox dengan Padding agar tidak menabrak Icon
+    local KeyBox = Custom:Create("TextBox", {
+      Position = UDim2.new(0.5, -160, 0, 92),
+      Size = UDim2.new(0, 320, 0, 47),
+      BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+      TextColor3 = Color3.fromRGB(255, 255, 255),
+      PlaceholderText = "Enter Key",
+      PlaceholderColor3 = Color3.fromRGB(140, 140, 140),
+      Font = Enum.Font.Gotham,
+      TextSize = 17,
+      BorderSizePixel = 0,
+      ClearTextOnFocus = false,
+      TextXAlignment = Enum.TextXAlignment.Left,
+    }, KeyMain)
 
-Custom:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, KeyBox)
+    Custom:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, KeyBox)
+    Custom:Create("UIPadding", {PaddingLeft = UDim.new(0, 48)}, KeyBox)
 
--- ✅ PERBAIKAN: Tambahkan Padding agar teks tidak menabrak ikon
-Custom:Create("UIPadding", {
-    PaddingLeft = UDim.new(0, 45) -- Memberi ruang kosong di kiri
-}, KeyBox)
+    Custom:Create("ImageLabel", {
+      Size = UDim2.new(0, 24, 0, 24),
+      Position = UDim2.new(0, 12, 0.5, -12),
+      BackgroundTransparency = 1,
+      Image = "rbxassetid://96510194465420",
+      ImageColor3 = Color3.fromRGB(180, 180, 180),
+    }, KeyBox)
 
--- Icon Key
-Custom:Create("ImageLabel", {
-    Size = UDim2.new(0, 24, 0, 24),
-    Position = UDim2.new(0, 12, 0.5, -12), -- Posisi ikon tetap di kiri
-    BackgroundTransparency = 1,
-    Image = "rbxassetid://96510194465420",
-    ImageColor3 = Color3.fromRGB(180, 180, 180),
-}, KeyBox)
-
-
-    -- Buttons Logic
+    -- Fungsi Pembuat Tombol
     local function CreateKeyButton(name, text, iconId, xPos, bgColor)
       local btn = Custom:Create("TextButton", {
         Name = name,
@@ -422,7 +412,6 @@ Custom:Create("ImageLabel", {
       }, KeyMain)
 
       Custom:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, btn)
-
       Custom:Create("ImageLabel", {
         Size = UDim2.new(0, 20, 0, 20),
         Position = UDim2.new(0, 12, 0.5, -10),
@@ -430,21 +419,15 @@ Custom:Create("ImageLabel", {
         Image = iconId,
         ImageColor3 = Color3.fromRGB(255, 255, 255),
       }, btn)
-
       return btn
     end
 
-    -- Posisi diperapat
     local ExitButton = CreateKeyButton("Exit", "Exit", "rbxassetid://84895399304975", 35, Color3.fromRGB(45, 45, 45))
     local GetKeyButton = CreateKeyButton("GetKey", "Get key", "rbxassetid://96510194465420", 160, Color3.fromRGB(40, 40, 45))
     local SubmitButton = CreateKeyButton("Submit", "Submit", "rbxassetid://92473583511724", 285, Color3.fromRGB(100, 100, 125))
 
     local KeyValid = false
-
-    ExitButton.Activated:Connect(function()
-      KeyScreenGui:Destroy()
-    end)
-
+    ExitButton.Activated:Connect(function() KeyScreenGui:Destroy() end)
     GetKeyButton.Activated:Connect(function()
       if KeyURL ~= "" then
         setclipboard(KeyURL)
@@ -455,12 +438,8 @@ Custom:Create("ImageLabel", {
     SubmitButton.Activated:Connect(function()
       local isValid = false
       for _, key in ipairs(ValidKeys) do
-        if KeyBox.Text == key then
-          isValid = true
-          break
-        end
+        if KeyBox.Text == key then isValid = true break end
       end
-
       if isValid then
         KeyScreenGui:Destroy()
         KeyValid = true
@@ -469,7 +448,6 @@ Custom:Create("ImageLabel", {
         KeyBox.PlaceholderText = "Wrong Key!"
       end
     end)
-
     repeat task.wait(0.1) until KeyValid
   end
 
