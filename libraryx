@@ -2406,6 +2406,19 @@ function Speed_Library:CreateWindow(Config)
   return Funcs_Colorpicker
 end
 
+
+
+      ItemCount += 1
+      return Item
+    end
+
+    CountTab += 1
+    return Sections
+  end
+
+  return Tabs
+end
+
 function Speed_Library:CreateKeySystem(Config)
   local KeySystemEnabled = Config.keysystem or Config[1] or true
   local Title = Config.Title or Config[2] or "Key System"
@@ -2519,15 +2532,4 @@ function Speed_Library:CreateKeySystem(Config)
   end)
 end
 
-      ItemCount += 1
-      return Item
-    end
-
-    CountTab += 1
-    return Sections
-  end
-
-  return Tabs
-end
-
-return Speed_Library 
+return Speed_Library
