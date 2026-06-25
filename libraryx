@@ -324,7 +324,7 @@ function Speed_Library:Notify(Config)
     self:SetNotification(Config)
 end
 
-Function Speed_Library:CreateWindow(Config)
+function Speed_Library:CreateWindow(Config)
   local Title = Config[1] or Config.Title or ""
   local Description = Config[2] or Config.Description or ""
   local TabWidth = Config[3] or Config["Tab Width"] or 120
@@ -385,7 +385,6 @@ Function Speed_Library:CreateWindow(Config)
       Size = UDim2.new(0, 320, 0, 47),
       BackgroundColor3 = Color3.fromRGB(35, 35, 35),
       TextColor3 = Color3.fromRGB(255, 255, 255),
-      Text = "", -- [PERBAIKAN 1]: Mengosongkan text agar "TextBox" tidak muncul dan Placeholder bisa terlihat
       PlaceholderText = "Enter Key",
       PlaceholderColor3 = Color3.fromRGB(140, 140, 140),
       Font = Enum.Font.Gotham,
@@ -404,8 +403,7 @@ Function Speed_Library:CreateWindow(Config)
     -- Icon Key
     Custom:Create("ImageLabel", {
       Size = UDim2.new(0, 24, 0, 24),
-      -- [PERBAIKAN 2]: Offset posisi X menjadi -36 karena ada PaddingLeft sebesar 48 (48 - 36 = 12 pixel jarak dari tepi kiri)
-      Position = UDim2.new(0, -36, 0.5, -12), 
+      Position = UDim2.new(0, 12, 0.5, -12),
       BackgroundTransparency = 1,
       Image = "rbxassetid://96510194465420",
       ImageColor3 = Color3.fromRGB(180, 180, 180),
@@ -493,7 +491,6 @@ Function Speed_Library:CreateWindow(Config)
     -- Tunggu key valid sebelum membuat window
     repeat task.wait(0.1) until KeyValid
   end
-
 
   -- Lanjutkan dengan window UI biasa...
   local SpeedHubXGui = Custom:Create("ScreenGui", {
