@@ -386,6 +386,7 @@ function Speed_Library:CreateWindow(Config)
       BackgroundColor3 = Color3.fromRGB(35, 35, 35),
       TextColor3 = Color3.fromRGB(255, 255, 255),
       PlaceholderText = "Enter Key",
+      Text = "",
       PlaceholderColor3 = Color3.fromRGB(140, 140, 140),
       Font = Enum.Font.Gotham,
       TextSize = 17,
