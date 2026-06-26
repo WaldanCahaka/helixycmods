@@ -390,8 +390,9 @@ function Speed_Library:CreateWindow(Config)
       Font = Enum.Font.Gotham,
       TextSize = 17,
       BorderSizePixel = 0,
-      ClearTextOnFocus = true,
+      ClearTextOnFocus = false,
       TextXAlignment = Enum.TextXAlignment.Left,
+      TextEdgeInsets = Offset.new(15, 0, 15, 0),
     }, KeyMain)
 
     Custom:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, KeyBox)
