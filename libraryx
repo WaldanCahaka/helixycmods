@@ -381,7 +381,7 @@ function Speed_Library:CreateWindow(Config)
 
     -- KeyBox
     local KeyBox = Custom:Create("TextBox", {
-      Position = UDim2.new(0.5, -160, 0, 92),
+      Position = UDim2.new(0.5, -140, 0, 92),
       Size = UDim2.new(0, 320, 0, 47),
       BackgroundColor3 = Color3.fromRGB(35, 35, 35),
       TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -396,9 +396,7 @@ function Speed_Library:CreateWindow(Config)
 
     Custom:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, KeyBox)
     
-    local Padding = Custom:Create("UIPadding", {
-      PaddingLeft = UDim.new(0, 48)
-    }, KeyBox)
+    
 
     -- Icon Key
     Custom:Create("ImageLabel", {
