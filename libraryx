@@ -384,14 +384,14 @@ function Speed_Library:CreateWindow(Config)
   Size = UDim2.new(0, 320, 0, 47),
   BackgroundColor3 = Color3.fromRGB(35, 35, 35),
   TextColor3 = Color3.fromRGB(255, 255, 255),
-  PlaceholderText = "     Enter Key",
+  PlaceholderText = "Enter Key",
   Text = "",
   PlaceholderColor3 = Color3.fromRGB(140, 140, 140),
   Font = Enum.Font.Gotham,
   TextSize = 17,
   BorderSizePixel = 0,
   ClearTextOnFocus = false,
-  TextXAlignment = Enum.TextXAlignment.Left,
+  TextXAlignment = Enum.TextXAlignment.Center,
 }, KeyMain)
 
 Custom:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, KeyBox)
