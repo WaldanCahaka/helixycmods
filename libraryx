@@ -396,9 +396,6 @@ function Speed_Library:CreateWindow(Config)
 
     Custom:Create("UICorner", {CornerRadius = UDim.new(0, 10)}, KeyBox)
     
-    local Padding = Custom:Create("UIPadding", {
-      PaddingLeft = UDim.new(0, 48)
-    }, KeyBox)
 
     -- Icon Key
     Custom:Create("ImageLabel", {
