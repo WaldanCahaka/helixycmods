@@ -1551,7 +1551,6 @@ function Item:AddSlider(Config)
     Name = "Content",
   }, Slider)
 
-  -- Bar luar (tidak di-clip, tempat teks value ditaruh biar gak kepotong)
   local SliderBar = Custom:Create("Frame", {
     BackgroundColor3 = SliderColor,
     BackgroundTransparency = 0.9,
@@ -1559,13 +1558,12 @@ function Item:AddSlider(Config)
     Position = UDim2.new(0, 12, 0, 30),
     Size = UDim2.new(1, -24, 0, 26),
     Name = "SliderBar",
-    ClipsDescendants = false, -- penting: jangan clip di sini
+    ClipsDescendants = false,
   }, Slider)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 5)}, SliderBar)
   Custom:Create("UIStroke", {Color = SliderColor}, SliderBar)
 
-  -- Frame khusus buat nge-clip biar rounded corner-nya tetep rapi
   local ClipMask = Custom:Create("Frame", {
     BackgroundTransparency = 1,
     BorderSizePixel = 0,
@@ -1574,6 +1572,7 @@ function Item:AddSlider(Config)
     Name = "ClipMask",
     ZIndex = 1,
   }, SliderBar)
+  Custom:Create("UICorner", {CornerRadius = UDim.new(0, 5)}, ClipMask)
 
   local SliderDrag = Custom:Create("Frame", {
     BackgroundColor3 = SliderColor,
@@ -1586,7 +1585,6 @@ function Item:AddSlider(Config)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 5)}, SliderDrag)
 
-  -- Cuma SATU label teks, ZIndex tinggi, gak ikut ke-clip, gak pernah kepotong
   local ValueLabel = Custom:Create("TextLabel", {
     Font = Enum.Font.GothamBold,
     Text = "",
