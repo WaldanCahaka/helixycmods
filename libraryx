@@ -1516,7 +1516,7 @@ Custom:Create("ImageLabel", {
         return Funcs_Toggle
       end
       
-      function Item:AddSlider(Config)
+function Item:AddSlider(Config)
   local Title = Config[1] or Config.Title or Config.Name or "Slider"
   local Increment = Config[3] or Config.Increment or 1
   local Min = Config[4] or Config.Min or 0
@@ -1551,6 +1551,7 @@ Custom:Create("ImageLabel", {
     Name = "Content",
   }, Slider)
 
+  -- Bar luar (tidak di-clip, tempat teks value ditaruh biar gak kepotong)
   local SliderBar = Custom:Create("Frame", {
     BackgroundColor3 = SliderColor,
     BackgroundTransparency = 0.9,
@@ -1558,23 +1559,20 @@ Custom:Create("ImageLabel", {
     Position = UDim2.new(0, 12, 0, 30),
     Size = UDim2.new(1, -24, 0, 26),
     Name = "SliderBar",
-    ClipsDescendants = true,
+    ClipsDescendants = false, -- penting: jangan clip di sini
   }, Slider)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 5)}, SliderBar)
   Custom:Create("UIStroke", {Color = SliderColor}, SliderBar)
 
-  local BarValueLabel = Custom:Create("TextLabel", {
-    Font = Enum.Font.GothamBold,
-    Text = "",
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 13,
-    TextTransparency = 0.8,
-    TextXAlignment = Enum.TextXAlignment.Left,
+  -- Frame khusus buat nge-clip biar rounded corner-nya tetep rapi
+  local ClipMask = Custom:Create("Frame", {
     BackgroundTransparency = 1,
-    Position = UDim2.new(0, 12, 0, 6),
-    Size = UDim2.new(1, -12, 0, 14),
-    Name = "Value",
+    BorderSizePixel = 0,
+    Size = UDim2.new(1, 0, 1, 0),
+    ClipsDescendants = true,
+    Name = "ClipMask",
+    ZIndex = 1,
   }, SliderBar)
 
   local SliderDrag = Custom:Create("Frame", {
@@ -1582,13 +1580,14 @@ Custom:Create("ImageLabel", {
     BackgroundTransparency = 0.3,
     BorderSizePixel = 0,
     Size = UDim2.new(0, 0, 1, 0),
-    ClipsDescendants = true,
     Name = "SliderDrag",
-  }, SliderBar)
+    ZIndex = 1,
+  }, ClipMask)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 5)}, SliderDrag)
 
-  local DragValueLabel = Custom:Create("TextLabel", {
+  -- Cuma SATU label teks, ZIndex tinggi, gak ikut ke-clip, gak pernah kepotong
+  local ValueLabel = Custom:Create("TextLabel", {
     Font = Enum.Font.GothamBold,
     Text = "",
     TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -1598,7 +1597,8 @@ Custom:Create("ImageLabel", {
     Position = UDim2.new(0, 12, 0, 6),
     Size = UDim2.new(1, -12, 0, 14),
     Name = "Value",
-  }, SliderDrag)
+    ZIndex = 5,
+  }, SliderBar)
 
   local function Round(Number, Factor)
     if Factor == 0 then return Number end
@@ -1643,9 +1643,7 @@ Custom:Create("ImageLabel", {
     TweenService:Create(SliderDrag, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
       Size = UDim2.fromScale((Funcs_Slider.Value - Min) / (Max - Min), 1)
     }):Play()
-    local Text = tostring(Funcs_Slider.Value) .. " " .. ValueName
-    BarValueLabel.Text = Text
-    DragValueLabel.Text = Text
+    ValueLabel.Text = tostring(Funcs_Slider.Value) .. " " .. ValueName
     Callback(Funcs_Slider.Value)
   end
 
