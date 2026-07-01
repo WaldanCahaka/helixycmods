@@ -1532,7 +1532,7 @@ function Item:AddSlider(Config)
     BackgroundTransparency = 0.935,
     BorderSizePixel = 0,
     LayoutOrder = ItemCount,
-    Size = UDim2.new(0.9, 0, 0, 65),
+    Size = UDim2.new(1, 0, 0, 55),
     Name = "Slider",
   }, SectionAdd)
 
