@@ -1516,6 +1516,7 @@ Custom:Create("ImageLabel", {
         return Funcs_Toggle
       end
       
+
 function Item:AddSlider(Config)
   local Title = Config[1] or Config.Title or Config.Name or "Slider"
   local Increment = Config[3] or Config.Increment or 1
@@ -1532,7 +1533,7 @@ function Item:AddSlider(Config)
     BackgroundTransparency = 0.935,
     BorderSizePixel = 0,
     LayoutOrder = ItemCount,
-    Size = UDim2.new(1, 0, 0, 55),
+    Size = UDim2.new(1, 0, 0, 65),
     Name = "Slider",
   }, SectionAdd)
 
@@ -1558,34 +1559,37 @@ function Item:AddSlider(Config)
     Position = UDim2.new(0, 12, 0, 30),
     Size = UDim2.new(1, -24, 0, 26),
     Name = "SliderBar",
-    ClipsDescendants = false,
+    ClipsDescendants = true,
   }, Slider)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 5)}, SliderBar)
   Custom:Create("UIStroke", {Color = SliderColor}, SliderBar)
 
-  local ClipMask = Custom:Create("Frame", {
+  local BarValueLabel = Custom:Create("TextLabel", {
+    Font = Enum.Font.GothamBold,
+    Text = "",
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextSize = 13,
+    TextTransparency = 0.8,
+    TextXAlignment = Enum.TextXAlignment.Left,
     BackgroundTransparency = 1,
-    BorderSizePixel = 0,
-    Size = UDim2.new(1, 0, 1, 0),
-    ClipsDescendants = true,
-    Name = "ClipMask",
-    ZIndex = 1,
+    Position = UDim2.new(0, 12, 0, 6),
+    Size = UDim2.new(1, -12, 0, 14),
+    Name = "Value",
   }, SliderBar)
-  Custom:Create("UICorner", {CornerRadius = UDim.new(0, 5)}, ClipMask)
 
   local SliderDrag = Custom:Create("Frame", {
     BackgroundColor3 = SliderColor,
     BackgroundTransparency = 0.3,
     BorderSizePixel = 0,
     Size = UDim2.new(0, 0, 1, 0),
+    ClipsDescendants = true,
     Name = "SliderDrag",
-    ZIndex = 1,
-  }, ClipMask)
+  }, SliderBar)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 5)}, SliderDrag)
 
-  local ValueLabel = Custom:Create("TextLabel", {
+  local DragValueLabel = Custom:Create("TextLabel", {
     Font = Enum.Font.GothamBold,
     Text = "",
     TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -1595,8 +1599,7 @@ function Item:AddSlider(Config)
     Position = UDim2.new(0, 12, 0, 6),
     Size = UDim2.new(1, -12, 0, 14),
     Name = "Value",
-    ZIndex = 5,
-  }, SliderBar)
+  }, SliderDrag)
 
   local function Round(Number, Factor)
     if Factor == 0 then return Number end
@@ -1641,7 +1644,9 @@ function Item:AddSlider(Config)
     TweenService:Create(SliderDrag, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
       Size = UDim2.fromScale((Funcs_Slider.Value - Min) / (Max - Min), 1)
     }):Play()
-    ValueLabel.Text = tostring(Funcs_Slider.Value) .. " " .. ValueName
+    local Text = tostring(Funcs_Slider.Value) .. " " .. ValueName
+    BarValueLabel.Text = Text
+    DragValueLabel.Text = Text
     Callback(Funcs_Slider.Value)
   end
 
@@ -1650,7 +1655,8 @@ function Item:AddSlider(Config)
 
   ItemCount += 1
   return Funcs_Slider
-end
+end     
+
 
       function Item:AddInput(Config)
         local Title = Config[1] or Config.Title or ""
