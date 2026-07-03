@@ -176,7 +176,7 @@ local function RepositionNotifications()
     end
 end
 
-function ShowNotification(title, description, duration, showProgress)
+function Speed_Library:ShowNotification(title, description, duration, showProgress)
     duration = duration or 5
     showProgress = showProgress ~= false
 
@@ -186,8 +186,8 @@ function ShowNotification(title, description, duration, showProgress)
         ScreenGui = Instance.new("ScreenGui")
         ScreenGui.Name = "WindNotifications"
         ScreenGui.ResetOnSpawn = false
-        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
         ScreenGui.Parent = Player.PlayerGui
+        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
     end
 
     local notifHeight = 60
@@ -202,7 +202,7 @@ function ShowNotification(title, description, duration, showProgress)
     Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     Frame.BackgroundTransparency = 0.4
     Frame.BorderSizePixel = 0
-    Frame.ClipsDescendants = false
+    Frame.ClipsDescendants = true
     Frame.ZIndex = 9999
     Frame.Parent = ScreenGui
 
@@ -210,15 +210,14 @@ function ShowNotification(title, description, duration, showProgress)
 
     local Corner = Instance.new("UICorner")
     Corner.CornerRadius = UDim.new(0, 8)
-    Corner.ZIndex = 9999
     Corner.Parent = Frame
 
     local Stroke = Instance.new("UIStroke")
     Stroke.Color = Color3.fromRGB(239, 68, 68)
     Stroke.Thickness = 1.5
-    Stroke.ZIndex = 9999
     Stroke.Parent = Frame
 
+    -- FULL PROGRESS OVERLAY
     if showProgress then
         local ProgressOverlay = Instance.new("Frame")
         ProgressOverlay.Size = UDim2.new(1, 0, 1, 0)
@@ -226,12 +225,11 @@ function ShowNotification(title, description, duration, showProgress)
         ProgressOverlay.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
         ProgressOverlay.BackgroundTransparency = 0.5
         ProgressOverlay.BorderSizePixel = 0
-        ProgressOverlay.ZIndex = 9998
+        ProgressOverlay.ZIndex = 1
         ProgressOverlay.Parent = Frame
 
         local ProgressCorner = Instance.new("UICorner")
         ProgressCorner.CornerRadius = UDim.new(0, 8)
-        ProgressCorner.ZIndex = 9998
         ProgressCorner.Parent = ProgressOverlay
 
         TweenService:Create(
@@ -252,7 +250,7 @@ function ShowNotification(title, description, duration, showProgress)
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.TextXAlignment = Enum.TextXAlignment.Left
     Title.Text = tostring(title)
-    Title.ZIndex = 10000
+    Title.ZIndex = 2
     Title.Parent = Frame
 
     local Desc = Instance.new("TextLabel")
@@ -266,7 +264,7 @@ function ShowNotification(title, description, duration, showProgress)
     Desc.TextXAlignment = Enum.TextXAlignment.Left
     Desc.TextYAlignment = Enum.TextYAlignment.Top
     Desc.Text = tostring(description)
-    Desc.ZIndex = 10000
+    Desc.ZIndex = 2
     Desc.Parent = Frame
 
     TweenService:Create(
