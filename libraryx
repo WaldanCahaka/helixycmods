@@ -1513,8 +1513,7 @@ function Item:AddSlider(Config)
   }, SectionAdd)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, Slider)
-  Custom:Create("UIStroke", {Color = SliderColor, Transparency = 0.6}, Slider)
-
+  
   Custom:Create("TextLabel", {
     Font = Enum.Font.GothamBold,
     Text = Title,
@@ -1538,6 +1537,7 @@ function Item:AddSlider(Config)
   }, Slider)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 5)}, SliderBar)
+  Custom:Create("UIStroke", {Color = SliderColor, Transparency = 0.4}, SliderBar)
   
   local BarValueLabel = Custom:Create("TextLabel", {
     Font = Enum.Font.GothamBold,
