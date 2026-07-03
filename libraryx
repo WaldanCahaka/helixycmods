@@ -630,6 +630,16 @@ Custom:Create("ImageLabel", {
     Size = UDim2.new(0, TabWidth, 1, -59),
     Name = "LayersTab"
   }, Main)
+  
+  -- Tambahkan ini setelah Layer dibikin, di antara LayersTab dan Layers
+
+Custom:Create("Frame", {
+  BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+  BorderSizePixel = 0,
+  Position = UDim2.new(0, TabWidth + 9, 0, 50),
+  Size = UDim2.new(0, 1, 1, -59),
+  Name = "TabDivider"
+}, Main)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 2)}, LayersTab)
   Custom:Create("Frame", {
@@ -652,6 +662,14 @@ Custom:Create("ImageLabel", {
     Size = UDim2.new(1, -(TabWidth + 9 + 18), 1, -59),
     Name = "Layers"
   }, Main)
+  
+  Custom:Create("Frame", {
+  BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+  BorderSizePixel = 0,
+  Position = UDim2.new(0, TabWidth + 9, 0, 50),
+  Size = UDim2.new(0, 1, 1, -59),
+  Name = "TabDivider"
+}, Main)
 
   Custom:Create("UICorner", {CornerRadius = UDim.new(0, 2)}, Layers)
 
