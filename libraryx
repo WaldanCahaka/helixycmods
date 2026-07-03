@@ -187,7 +187,7 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
         ScreenGui.Name = "WindNotifications"
         ScreenGui.ResetOnSpawn = false
         ScreenGui.Parent = Player.PlayerGui
-        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+        
     end
 
     local notifHeight = 60
@@ -203,7 +203,6 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
     Frame.BackgroundTransparency = 0.4
     Frame.BorderSizePixel = 0
     Frame.ClipsDescendants = true
-    Frame.ZIndex = 9999
     Frame.Parent = ScreenGui
 
     table.insert(ActiveNotifications, Frame)
@@ -331,6 +330,7 @@ function Speed_Library:CreateWindow(Config)
   local TabWidth = Config[3] or Config["Tab Width"] or 120
   local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(550, 315)
   
+  -- ✅ TAMBAHKAN INI UNTUK KEY SYSTEM
   local KeySystem = Config.KeySystem or nil
   local ValidKeys = KeySystem and KeySystem.Key or {}
   local KeyNote = KeySystem and KeySystem.Note or "Enter your key"
