@@ -187,6 +187,7 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
         ScreenGui.Name = "WindNotifications"
         ScreenGui.ResetOnSpawn = false
         ScreenGui.Parent = Player.PlayerGui
+        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
     end
 
     local notifHeight = 60
@@ -201,7 +202,8 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
     Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     Frame.BackgroundTransparency = 0.4
     Frame.BorderSizePixel = 0
-    Frame.ClipsDescendants = false
+    Frame.ClipsDescendants = true
+    Frame.ZIndex = 9999
     Frame.Parent = ScreenGui
 
     table.insert(ActiveNotifications, Frame)
