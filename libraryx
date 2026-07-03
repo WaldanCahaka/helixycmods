@@ -155,7 +155,6 @@ end
 local Speed_Library = {}
 Speed_Library.Unloaded = false
 
--- ==================== WIND UI NOTIFICATION SYSTEM WITH FULL OVERLAY PROGRESS ====================
 local ActiveNotifications = {}
 local TweenService = game:GetService("TweenService")
 local Player = game.Players.LocalPlayer
@@ -202,7 +201,7 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
     Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     Frame.BackgroundTransparency = 0.4
     Frame.BorderSizePixel = 0
-    Frame.ClipsDescendants = true
+    Frame.ClipsDescendants = false
     Frame.Parent = ScreenGui
 
     table.insert(ActiveNotifications, Frame)
@@ -631,8 +630,6 @@ Custom:Create("ImageLabel", {
     Name = "LayersTab"
   }, Main)
   
-  -- Tambahkan ini setelah Layer dibikin, di antara LayersTab dan Layers
-
 Custom:Create("Frame", {
   BackgroundColor3 = Color3.fromRGB(50, 50, 50),
   BorderSizePixel = 0,
