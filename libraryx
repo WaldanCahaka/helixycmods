@@ -627,7 +627,7 @@ Custom:Create("ImageLabel", {
     BorderColor3 = Color3.fromRGB(0, 0, 0),
     BorderSizePixel = 0,
     Position = UDim2.new(0, 9, 0, 50),
-    Size = UDim2.new(0, TabWidth, 1, -59),
+    Size = UDim2.new(0, TabWidth - 20, 1, -59),
     Name = "LayersTab"
   }, Main)
   
