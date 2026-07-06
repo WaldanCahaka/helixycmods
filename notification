@@ -1,15 +1,10 @@
 local Speed_Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/WaldanCahaka/helixycmods/refs/heads/main/libraryx"))()
 
 local Library = Speed_Library:CreateWindow({
-    Title = "Helixy Hub",
-    Description = "Version 1.0",
+    Title = "Helixy Hub Prison Life",
+    Description = "Version 2.0",
     ["Tab Width"] = 140,
     
-    KeySystem = {
-        Key = {"1", "HELIXY2026", "TESTKEY123"},
-        Note = "Key System",
-        URL = "HELIXY2026, TESTKEY123"
-    }
 })
 
 -- ==================== TAB PLAYER ====================
