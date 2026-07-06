@@ -187,6 +187,7 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
         ScreenGui.Name = "WindNotifications"
         ScreenGui.ResetOnSpawn = false
         ScreenGui.Parent = Player.PlayerGui
+        
     end
 
     local notifHeight = 60
@@ -198,8 +199,8 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
     local Frame = Instance.new("Frame")
     Frame.Size = UDim2.new(0, 260, 0, notifHeight)
     Frame.Position = UDim2.new(1, 20, 0, targetY)
-    Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    Frame.BackgroundTransparency = 0
+    Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    Frame.BackgroundTransparency = 0.4
     Frame.BorderSizePixel = 0
     Frame.ClipsDescendants = true
     Frame.Parent = ScreenGui
@@ -207,74 +208,80 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
     table.insert(ActiveNotifications, Frame)
 
     local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, 10)
+    Corner.CornerRadius = UDim.new(0, 8)
     Corner.Parent = Frame
 
     local Stroke = Instance.new("UIStroke")
-    Stroke.Color = Color3.fromRGB(93, 93, 93)
-    Stroke.Thickness = 1.2
+    Stroke.Color = Color3.fromRGB(239, 68, 68)
+    Stroke.Thickness = 1.5
     Stroke.Parent = Frame
 
-    local Padding = Instance.new("UIPadding")
-    Padding.PaddingLeft = UDim.new(0, 12)
-    Padding.PaddingRight = UDim.new(0, 12)
-    Padding.PaddingTop = UDim.new(0, 12)
-    Padding.PaddingBottom = UDim.new(0, 12)
-    Padding.Parent = Frame
+    -- FULL PROGRESS OVERLAY
+    if showProgress then
+        local ProgressOverlay = Instance.new("Frame")
+        ProgressOverlay.Size = UDim2.new(1, 0, 1, 0)
+        ProgressOverlay.Position = UDim2.new(0, 0, 0, 0)
+        ProgressOverlay.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
+        ProgressOverlay.BackgroundTransparency = 0.5
+        ProgressOverlay.BorderSizePixel = 0
+        ProgressOverlay.ZIndex = 1
+        ProgressOverlay.Parent = Frame
 
-    -- Icon
-    local Icon = Instance.new("ImageLabel")
-    Icon.Size = UDim2.new(0, 20, 0, 20)
-    Icon.Position = UDim2.new(0, 0, 0, 0)
-    Icon.BackgroundTransparency = 1
-    Icon.Image = "rbxassetid://4384403532"
-    Icon.ImageColor3 = Color3.fromRGB(240, 240, 240)
-    Icon.Parent = Frame
+        local ProgressCorner = Instance.new("UICorner")
+        ProgressCorner.CornerRadius = UDim.new(0, 8)
+        ProgressCorner.Parent = ProgressOverlay
+
+        TweenService:Create(
+            ProgressOverlay,
+            TweenInfo.new(duration, Enum.EasingStyle.Linear),
+            {
+                Size = UDim2.new(0, 0, 1, 0)
+            }
+        ):Play()
+    end
 
     local Title = Instance.new("TextLabel")
     Title.BackgroundTransparency = 1
-    Title.Position = UDim2.new(0, 30, 0, 0)
-    Title.Size = UDim2.new(1, -30, 0, 20)
+    Title.Position = UDim2.new(0, 12, 0, 5)
+    Title.Size = UDim2.new(1, -24, 0, 18)
     Title.Font = Enum.Font.GothamBold
-    Title.TextSize = 15
+    Title.TextSize = 14
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.TextXAlignment = Enum.TextXAlignment.Left
     Title.Text = tostring(title)
+    Title.ZIndex = 2
     Title.Parent = Frame
 
     local Desc = Instance.new("TextLabel")
     Desc.BackgroundTransparency = 1
-    Desc.Position = UDim2.new(0, 30, 0, 25)
-    Desc.Size = UDim2.new(1, -30, 0, 28)
-    Desc.Font = Enum.Font.GothamSemibold
-    Desc.TextSize = 14
-    Desc.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Desc.Position = UDim2.new(0, 12, 0, 24)
+    Desc.Size = UDim2.new(1, -24, 0, 28)
+    Desc.Font = Enum.Font.Gotham
+    Desc.TextSize = 12
+    Desc.TextColor3 = Color3.fromRGB(220, 220, 220)
     Desc.TextWrapped = true
     Desc.TextXAlignment = Enum.TextXAlignment.Left
     Desc.TextYAlignment = Enum.TextYAlignment.Top
     Desc.Text = tostring(description)
+    Desc.ZIndex = 2
     Desc.Parent = Frame
 
     TweenService:Create(
         Frame,
-        TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-        {Position = UDim2.new(1, -280, 0, targetY)}
+        TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        {
+            Position = UDim2.new(1, -280, 0, targetY)
+        }
     ):Play()
 
-    task.delay(duration - 0.88, function()
+    task.delay(duration, function()
         if Frame and Frame.Parent then
-            TweenService:Create(Icon, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {ImageTransparency = 1}):Play()
-            TweenService:Create(Frame, TweenInfo.new(0.8, Enum.EasingStyle.Quint), {BackgroundTransparency = 0.6}):Play()
-            task.wait(0.3)
-            TweenService:Create(Stroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 0.9}):Play()
-            TweenService:Create(Title, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {TextTransparency = 0.4}):Play()
-            TweenService:Create(Desc, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {TextTransparency = 0.5}):Play()
-            task.wait(0.05)
-
             local SlideOut = TweenService:Create(
                 Frame,
-                TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
-                {Position = UDim2.new(1, 20, 0, targetY)}
+                TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In),
+                {
+                    Position = UDim2.new(1, 20, 0, targetY)
+                }
             )
 
             SlideOut:Play()
@@ -288,6 +295,7 @@ function Speed_Library:ShowNotification(title, description, duration, showProgre
                 end
 
                 Frame:Destroy()
+
                 RepositionNotifications()
 
                 if #ActiveNotifications == 0 and ScreenGui then
