@@ -1165,9 +1165,9 @@ end)
     local ParagraphContent = Custom:Create("TextLabel", {
       Font = Enum.Font.GothamBold,
       Text = Content,
-      TextColor3 = Color3.fromRGB(200, 200, 200),
+      TextColor3 = Color3.fromRGB(230, 230, 230),
       TextSize = 12,
-      TextTransparency = 0.3,
+      TextTransparency = 0,
       TextXAlignment = Enum.TextXAlignment.Left,
       TextYAlignment = Enum.TextYAlignment.Top,
       TextWrapped = true,
@@ -1198,7 +1198,7 @@ end)
 
     ItemCount += 1
     return SettingFuncs
-end 
+end
 
       function Item:AddSeperator(Config)
         local Title = Config[1] or Config.Title or ""
