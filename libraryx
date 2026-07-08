@@ -1131,72 +1131,74 @@ end)
       local Item, ItemCount = {}, 0
 
       function Item:AddParagraph(Config)
-        local Title = Config[1] or Config.Title or ""
-        local Content = Config[2] or Config.Content or ""
-        local SettingFuncs = {}
+    local Title = Config[1] or Config.Title or ""
+    local Content = Config[2] or Config.Content or ""
+    local SettingFuncs = {}
 
-        local Paragraph = Custom:Create("Frame", {
-          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-          BackgroundTransparency = 0.935,
-          BorderColor3 = Color3.fromRGB(0, 0, 0),
-          BorderSizePixel = 0,
-          LayoutOrder = ItemCount,
-          Size = UDim2.new(1, 0, 0, 35),
-          Name = "Paragraph",
-        }, SectionAdd)
-      
-        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, Paragraph)
+    local Paragraph = Custom:Create("Frame", {
+      BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+      BackgroundTransparency = 0.935,
+      BorderColor3 = Color3.fromRGB(0, 0, 0),
+      BorderSizePixel = 0,
+      LayoutOrder = ItemCount,
+      Size = UDim2.new(1, 0, 0, 35),
+      Name = "Paragraph",
+    }, SectionAdd)
+  
+    Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, Paragraph)
 
-        local ParagraphTitle = Custom:Create("TextLabel", {
-          Font = Enum.Font.GothamBold,
-          Text = Title,
-          TextColor3 = Color3.fromRGB(231, 231, 231),
-          TextSize = 13,
-          TextXAlignment = Enum.TextXAlignment.Left,
-          TextYAlignment = Enum.TextYAlignment.Top,
-          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-          BackgroundTransparency = 0.999,
-          BorderSizePixel = 0,
-          Position = UDim2.new(0, 10, 0, 10),
-          Size = UDim2.new(1, -16, 0, 13),
-          Name = "ParagraphTitle",
-        }, Paragraph)
-      
-        local ParagraphContent = Custom:Create("TextLabel", {
-          Font = Enum.Font.GothamBold,
-          Text = Content,
-          TextColor3 = Color3.fromRGB(255, 255, 255),
-          TextSize = 12,
-          TextTransparency = 0.6,
-          TextXAlignment = Enum.TextXAlignment.Left,
-          TextYAlignment = Enum.TextYAlignment.Bottom,
-          BackgroundTransparency = 0.999,
-          BorderSizePixel = 0,
-          Position = UDim2.new(0, 10, 0, 23),
-          Name = "ParagraphContent",
-        }, Paragraph)
+    local ParagraphTitle = Custom:Create("TextLabel", {
+      Font = Enum.Font.GothamBold,
+      Text = Title,
+      TextColor3 = Color3.fromRGB(231, 231, 231),
+      TextSize = 13,
+      TextXAlignment = Enum.TextXAlignment.Left,
+      TextYAlignment = Enum.TextYAlignment.Top,
+      BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+      BackgroundTransparency = 0.999,
+      BorderSizePixel = 0,
+      Position = UDim2.new(0, 10, 0, 5),
+      Size = UDim2.new(1, -20, 0, 15),
+      Name = "ParagraphTitle",
+    }, Paragraph)
+  
+    local ParagraphContent = Custom:Create("TextLabel", {
+      Font = Enum.Font.Gotham,
+      Text = Content,
+      TextColor3 = Color3.fromRGB(200, 200, 200),
+      TextSize = 12,
+      TextTransparency = 0.3,
+      TextXAlignment = Enum.TextXAlignment.Left,
+      TextYAlignment = Enum.TextYAlignment.Top,
+      TextWrapped = true,
+      BackgroundTransparency = 0.999,
+      BorderSizePixel = 0,
+      Position = UDim2.new(0, 10, 0, 22),
+      Size = UDim2.new(1, -20, 1, -27),
+      Name = "ParagraphContent",
+    }, Paragraph)
 
-        local function UpdateParagraphSize()
-          ParagraphContent.TextWrapped = false
-          local lineCount = math.ceil(ParagraphContent.TextBounds.X / ParagraphContent.AbsoluteSize.X)
-          ParagraphContent.Size = UDim2.new(1, -16, 0, 12 + (12 * lineCount))
-          Paragraph.Size = UDim2.new(1, 0, 0, ParagraphContent.AbsoluteSize.Y + 33)
-          ParagraphContent.TextWrapped = true
-          UpdateSizeSection()
-        end
+    local function UpdateParagraphSize()
+      local contentHeight = ParagraphContent.TextBounds.Y
+      local minHeight = 50
+      local totalHeight = math.max(minHeight, contentHeight + 27)
+      Paragraph.Size = UDim2.new(1, 0, 0, totalHeight)
+    end
 
-        UpdateParagraphSize()
-        ParagraphContent:GetPropertyChangedSignal("AbsoluteSize"):Connect(UpdateParagraphSize)
+    game:GetService("RunService").RenderStepped:Connect(function()
+      UpdateParagraphSize()
+    end)
 
-        function SettingFuncs:Set(Config)
-          ParagraphTitle.Text = Config[1] or Config.Title or ""
-          ParagraphContent.Text = Config[2] or Config.Content or ""
-          UpdateParagraphSize()
-        end
+    function SettingFuncs:Set(Config)
+      ParagraphTitle.Text = Config[1] or Config.Title or ""
+      ParagraphContent.Text = Config[2] or Config.Content or ""
+      task.wait(0.05)
+      UpdateParagraphSize()
+    end
 
-        ItemCount += 1
-        return SettingFuncs
-      end
+    ItemCount += 1
+    return SettingFuncs
+end
 
       function Item:AddSeperator(Config)
         local Title = Config[1] or Config.Title or ""
