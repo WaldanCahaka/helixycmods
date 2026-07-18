@@ -1135,68 +1135,94 @@ end)
     local Content = Config[2] or Config.Content or ""
     local SettingFuncs = {}
 
+    local TextService = game:GetService("TextService")
+    local MAX_HEIGHT = 120
+
     local Paragraph = Custom:Create("Frame", {
-      BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-      BackgroundTransparency = 0.935,
-      BorderColor3 = Color3.fromRGB(0, 0, 0),
-      BorderSizePixel = 0,
-      LayoutOrder = ItemCount,
-      Size = UDim2.new(1, 0, 0, 35),
-      Name = "Paragraph",
+        BackgroundColor3 = Color3.fromRGB(255,255,255),
+        BackgroundTransparency = 0.935,
+        BorderSizePixel = 0,
+        LayoutOrder = ItemCount,
+        Size = UDim2.new(1,0,0,50),
+        Name = "Paragraph",
     }, SectionAdd)
-  
-    Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, Paragraph)
+
+    Custom:Create("UICorner", {
+        CornerRadius = UDim.new(0,4)
+    }, Paragraph)
 
     local ParagraphTitle = Custom:Create("TextLabel", {
-      Font = Enum.Font.GothamBold,
-      Text = Title,
-      TextColor3 = Color3.fromRGB(231, 231, 231),
-      TextSize = 14,
-      TextXAlignment = Enum.TextXAlignment.Left,
-      TextYAlignment = Enum.TextYAlignment.Top,
-      BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-      BackgroundTransparency = 0.999,
-      BorderSizePixel = 0,
-      Position = UDim2.new(0, 10, 0, 5),
-      Size = UDim2.new(1, -20, 0, 15),
-      Name = "ParagraphTitle",
+        Font = Enum.Font.GothamBold,
+        Text = Title,
+        TextColor3 = Color3.fromRGB(231,231,231),
+        TextSize = 14,
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        Position = UDim2.new(0,10,0,5),
+        Size = UDim2.new(1,-20,0,15),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Top,
     }, Paragraph)
-  
+
+    local Scroll = Custom:Create("ScrollingFrame", {
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        Position = UDim2.new(0,10,0,22),
+        Size = UDim2.new(1,-20,0,20),
+        CanvasSize = UDim2.new(),
+        ScrollBarThickness = 3,
+        AutomaticCanvasSize = Enum.AutomaticSize.None,
+        ScrollingDirection = Enum.ScrollingDirection.Y,
+        ClipsDescendants = true,
+    }, Paragraph)
+
     local ParagraphContent = Custom:Create("TextLabel", {
-      Font = Enum.Font.GothamBold,
-      Text = Content,
-      TextColor3 = Color3.fromRGB(200, 200, 200),
-      TextSize = 12,
-      TextTransparency = 0.3,
-      TextXAlignment = Enum.TextXAlignment.Left,
-      TextYAlignment = Enum.TextYAlignment.Top,
-      TextWrapped = true,
-      BackgroundTransparency = 0.999,
-      BorderSizePixel = 0,
-      Position = UDim2.new(0, 10, 0, 22),
-      Size = UDim2.new(1, -20, 1, -27),
-      Name = "ParagraphContent",
-    }, Paragraph)
+        Font = Enum.Font.Gotham,
+        Text = Content,
+        TextColor3 = Color3.fromRGB(200,200,200),
+        TextSize = 12,
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        AutomaticSize = Enum.AutomaticSize.Y,
+        Size = UDim2.new(1,-5,0,0),
+        TextWrapped = true,
+        RichText = true,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Top,
+    }, Scroll)
 
     local function UpdateParagraphSize()
-      local contentHeight = ParagraphContent.TextBounds.Y
-      local minHeight = 50
-      local totalHeight = math.max(minHeight, contentHeight + 27)
-      Paragraph.Size = UDim2.new(1, 0, 0, totalHeight)
+
+        local Width = math.max(Scroll.AbsoluteSize.X, 200)
+
+        local Bounds = TextService:GetTextSize(
+            ParagraphContent.Text,
+            ParagraphContent.TextSize,
+            ParagraphContent.Font,
+            Vector2.new(Width, math.huge)
+        )
+
+        ParagraphContent.Size = UDim2.new(1,-5,0,Bounds.Y)
+
+        Scroll.CanvasSize = UDim2.new(0,0,0,Bounds.Y)
+
+        local Height = math.min(Bounds.Y, MAX_HEIGHT)
+
+        Scroll.Size = UDim2.new(1,-20,0,Height)
+
+        Paragraph.Size = UDim2.new(1,0,0,Height + 32)
     end
 
-    game:GetService("RunService").RenderStepped:Connect(function()
-      UpdateParagraphSize()
-    end)
+    task.defer(UpdateParagraphSize)
 
     function SettingFuncs:Set(Config)
-      ParagraphTitle.Text = Config[1] or Config.Title or ""
-      ParagraphContent.Text = Config[2] or Config.Content or ""
-      task.wait(0.05)
-      UpdateParagraphSize()
+        ParagraphTitle.Text = Config[1] or Config.Title or ""
+        ParagraphContent.Text = Config[2] or Config.Content or ""
+        task.defer(UpdateParagraphSize)
     end
 
     ItemCount += 1
+
     return SettingFuncs
 end
 
